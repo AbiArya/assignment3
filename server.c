@@ -4,12 +4,41 @@
 #include <string.h>
 #include <stdlib.h>
 #include <netinet/in.h>
-int main(int argc, char* argv[]){
+#include <pthread.h>
+#include "sorter.h"
 
+void * sort(void *arg){
+	int * mysock = (int*)arg;
+	int rval;
+	char buff[1024];
+        memset(buff,0,sizeof(buff));
+	int i=0;
+	while(i==0){
+//		printf("in loop\n");
+		memset(buff,0,sizeof(buff));
+	        if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+	 	       perror("reading stream message error");
+	        else if(rval ==0){
+//			printf("exit");
+			i=1;
+		}else
+        	        printf("msg: %s\n", buff);
+		if(strcmp(buff,"director_name\n")==0)
+			printf("yes");
+		else
+			printf("no");
+        }
+        close(*mysock);
+	pthread_exit(0);
+}
+
+int main(int argc, char* argv[]){
+	threadNode *global = malloc(sizeof(threadNode));
+	threadNode *ptr = global;
 	//variables
 	int sock;//return value of socket function
-	struct sockaddr_in server;
-	int mysock;
+	struct sockaddr_in server, cli_addr;
+	//int mysock;
 	char buff[1024];
 	int rval;
 	// create socket
@@ -32,25 +61,31 @@ int main(int argc, char* argv[]){
 
 	//listen
 	listen(sock, 5);
-
+	int clilen = sizeof(cli_addr);
 	//accept
 	do{
-		mysock = accept(sock, (struct sockaddr *)0, 0);
-		if(mysock == -1)
+		int *mysock = malloc(sizeof(int));
+		*mysock = accept(sock, (struct sockaddr *)&cli_addr, &clilen);
+		
+		if(*mysock == -1)
 			perror("accept failed");
 		else{
-			memset(buff,0,sizeof(buff));
-			if((rval = recv(mysock,buff,sizeof(buff),0))<0)
-				perror("reading stream message error");
-			else if(rval ==0)
-				printf("ending connection\n");
-			else
-				printf("msg: %s\n", buff);
-			printf("got the message %d\n",rval);
-			close(mysock);
+			struct sockaddr_in *s = &cli_addr;
+			char ipstr[INET6_ADDRSTRLEN];
+			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof(ipstr));
+		//	printf("%s\n", ipstr);//ip address of the connection, store or print this, whatever
+			pthread_t newthread;
+			if(ptr->curr == NULL){
+			//	pthread_t newthread;
+				ptr->curr = &newthread;
+				ptr->next = malloc(sizeof(threadNode));
+				ptr = ptr->next;
+			}
+			pthread_create(&newthread, NULL, sort, (void*)mysock);			
 		}	
 	}while(1);	
-
+	
+	
 	return 0;
 }
 
