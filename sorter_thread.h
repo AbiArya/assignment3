@@ -24,6 +24,12 @@ struct temp{
 
 };
 
+typedef struct tNode{
+        pthread_t* curr;
+        struct tNode *next;
+}threadNode;
+
+
 typedef struct temp Node;
 
 struct trav_param{

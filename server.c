@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include "sorter.h"
+#include "sorter_thread.h"
 
 void * sort(void *arg){
 	int * mysock = (int*)arg;
