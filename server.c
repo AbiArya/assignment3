@@ -96,7 +96,7 @@ void * sort(void *arg){
 			//			printf("exit");
 			loop=1;
 		}else{
-			if(strcmp(buff,"stuff\n")==0)
+			if(strcmp(buff,"borisonufriyed\n")==0)
 				break;
 				if(id!=0){
 
@@ -245,7 +245,6 @@ int main(int argc, char* argv[]){
 	do{
 		int *mysock = malloc(sizeof(int));
 		*mysock = accept(sock, (struct sockaddr *)&cli_addr, &clilen);
-
 		if(*mysock == -1)
 			perror("accept failed");
 		else{
