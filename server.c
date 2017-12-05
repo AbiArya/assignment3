@@ -21,12 +21,178 @@ void * sort(void *arg){
 	        else if(rval ==0){
 //			printf("exit");
 			i=1;
-		}else
-        	        printf("msg: %s\n", buff);
-		if(strcmp(buff,"director_name\n")==0)
-			printf("yes");
-		else
-			printf("no");
+		}else{
+
+		
+    
+    	colNum = getColNum(titleRow, colName);
+    if(colNum == -1){
+        printf("Error has occured.\n");
+	fclose(fp);        
+	pthread_exit(NULL);
+    }
+    pthread_mutex_unlock(&lock);
+    // find what column # the title is in
+    
+    Node* head = (Node*)malloc(sizeof(Node));
+    int isNumeric = 1;
+    int id = 0;
+    head = NULL;
+
+    int stringCount = 1;
+    int stringCapacity = 10000; // current number of strings pointed to by char** string
+    char** strings = (char**)malloc(stringCapacity*sizeof(char*));
+    
+    
+    strings[id] = strdup(row);
+    char* cellWithSpaces = getCellAtInd(row,colNum);
+
+
+    //discern data type of sorting column
+    int i=0;
+
+    int isFloat=0;
+    
+
+    pthread_mutex_lock(&lock);
+    if(type == -1){
+
+	while(i < strlen(cellWithSpaces)){
+        
+		if(!isdigit(cellWithSpaces[i])){
+		    if(cellWithSpaces[i] == '.'){
+		        isFloat = 1;
+		        i++;
+		        continue;
+		    }
+		    isNumeric = 0;
+		    break;
+		} 
+		i++;
+
+    	}
+
+	if(isFloat) type = 1;
+	else if(isNumeric) type = 0;
+	else type = 2;
+
+    }
+    pthread_mutex_unlock(&lock);
+
+
+    // loop through each row and get the cell to sort
+    while(row!=NULL){
+
+        if(id!=0){
+
+            row = getRow(fp); //this is malloc'd...must free somewhere
+
+            stringCount++;
+            if(row==NULL) break;
+
+            if(stringCount == stringCapacity - 100){
+                
+                strings = moreCapacity(strings, stringCapacity);
+		stringCapacity = stringCapacity*1.5;
+            }
+	
+	    strings[id] = strdup(row);
+            cellWithSpaces = getCellAtInd(row, colNum);//row is the full row, but the parameter to the function ends up being just "Color"
+
+        }
+	if(strcmp(cellWithSpaces, "Error") == 0){ 
+		printf("Error has occurred\n");
+		fclose(fp);
+		pthread_exit(NULL);
+
+	}
+        char* cell = trim(cellWithSpaces);
+
+        //inserting the data in the column we're sorting by into a linked list
+	
+        Node* ins = (Node*)malloc(sizeof(Node));
+        ins->id = id;
+
+
+        if(type!=2){
+
+            if(type == 0){
+
+
+                int val=0;
+                sscanf(cell, "%d", &val); //parse int		
+                ins->number = val;
+            }
+            else if(type==1){
+
+                float val=0;
+                val = (float)atof(cell);
+                ins->dec = val;
+            }
+
+            head = insertAtHead(ins, head);
+        
+        }
+        else{
+
+	   
+            ins->word = strdup(cell);
+            head = insertAtHead(ins, head);
+
+        }
+
+	
+        id++;
+
+
+    }   
+    fclose(fp);
+
+    /* 0 for int, 2 for float, anything else for string */
+
+
+    if(isFloat){
+        head = mergeSort(head, 1);
+    }
+    else if(isNumeric){
+        head = mergeSort(head, 0);
+    }
+    else{
+        head = mergeSort(head, 2);
+    }
+
+    
+    Node* ptr = head;
+    Node* prev = NULL;
+    
+    
+    pthread_mutex_lock(&lock);
+
+    int ctr=0;
+    while(ptr!=NULL){
+  	ctr++;
+	insertArr(strings[ptr->id]);
+        free(strings[ptr->id]);
+	prev = ptr;
+        ptr=ptr->next;
+	if(!isNumeric){
+		free(prev->word);
+	}
+        free(prev);
+    } 
+    pthread_mutex_unlock(&lock);
+
+    
+    free(strings);
+
+		}
+        	        
+			
+
+
+
+
+
         }
         close(*mysock);
 	pthread_exit(0);
