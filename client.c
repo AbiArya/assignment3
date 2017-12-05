@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
 	struct sockaddr_in server;// socket struct
 	char buff[1024];//used for the input
 	struct hostent *hp; //used for getting hostname
-
+//test
 
 //	if(argc<7){
 //		printf("error, not even inputs");
