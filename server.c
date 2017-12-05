@@ -178,7 +178,6 @@ void * sort(void *arg){
 			int ctr=0;
 			while(ptr!=NULL){
 				ctr++;
-				insertArr(strings[ptr->id]);
 				free(strings[ptr->id]);
 				prev = ptr;
 				ptr=ptr->next;
@@ -200,7 +199,7 @@ void * sort(void *arg){
 
 
 
-	}
+	
 	close(*mysock);
 	pthread_exit(0);
 }
