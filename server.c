@@ -27,11 +27,18 @@ void * sort(void *arg){
 	int loop = 0;
 	char* row = NULL;
 	int column = 0;
-        if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
-                perror("reading stream message error");
-        else{
-                row = strdup(buff);
-        }
+	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+		perror("reading stream message error");
+	else{
+		column = atoi(buff);//should be column number
+	}
+	printf("%i\n", column);
+	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+		perror("reading stream message error");
+	else{
+		row = strdup(buff);//should be column number
+	}
+
 
 
 	Node* head = (Node*)malloc(sizeof(Node));
@@ -52,7 +59,6 @@ void * sort(void *arg){
 	int i=0;
 
 	int isFloat=0;
-
 
 	pthread_mutex_lock(&lock);
 	if(type == -1){
@@ -80,13 +86,6 @@ void * sort(void *arg){
 	pthread_mutex_unlock(&lock);
 
 
-
-
-
-
-
-
-
 	while(loop==0){
 		//		printf("in loop\n");
 		memset(buff,0,sizeof(buff));
@@ -96,119 +95,115 @@ void * sort(void *arg){
 			//			printf("exit");
 			loop=1;
 		}else{
-			if(strcmp(buff,"borisonufriyed\n")==0)
+			if(strcmp(buff,"borisonufriyev\n")==0)
 				break;
-				if(id!=0){
+			if(id!=0){
 
-					row = buff;
+				row = buff;
 
-					stringCount++;
-					if(row==NULL) break;
+				stringCount++;
+				if(row==NULL) break;
 
-					if(stringCount == stringCapacity - 100){
+				if(stringCount == stringCapacity - 100){
 
-						strings = moreCapacity(strings, stringCapacity);
-						stringCapacity = stringCapacity*1.5;
-					}
-
-					strings[id] = strdup(row);
-					cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
-
-				}
-				if(strcmp(cellWithSpaces, "Error") == 0){ 
-					printf("Error has occurred\n");
-					//DO ERROR SHIT
-
-				}
-				char* cell = trim(cellWithSpaces);
-
-				//inserting the data in the column we're sorting by into a linked list
-
-				Node* ins = (Node*)malloc(sizeof(Node));
-				ins->id = id;
-
-
-				if(type!=2){
-
-					if(type == 0){
-
-
-						int val=0;
-						sscanf(cell, "%d", &val); //parse int		
-						ins->number = val;
-					}
-					else if(type==1){
-
-						float val=0;
-						val = (float)atof(cell);
-						ins->dec = val;
-					}
-
-					head = insertAtHead(ins, head);
-
-				}
-				else{
-
-
-					ins->word = strdup(cell);
-					head = insertAtHead(ins, head);
-
+					strings = moreCapacity(strings, stringCapacity);
+					stringCapacity = stringCapacity*1.5;
 				}
 
+				strings[id] = strdup(row);
+				cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
 
-				id++;
-
-
-			}   
-	}
-			/* 0 for int, 2 for float, anything else for string */
-
-
-			if(isFloat){
-				head = mergeSort(head, 1);
 			}
-			else if(isNumeric){
-				head = mergeSort(head, 0);
+			if(strcmp(cellWithSpaces, "Error") == 0){ 
+				printf("Error has occurred\n");
+				//DO ERROR SHIT
+
+			}
+			char* cell = trim(cellWithSpaces);
+
+			//inserting the data in the column we're sorting by into a linked list
+
+			Node* ins = (Node*)malloc(sizeof(Node));
+			ins->id = id;
+
+
+			if(type!=2){
+
+				if(type == 0){
+
+
+					int val=0;
+					sscanf(cell, "%d", &val); //parse int		
+					ins->number = val;
+				}
+				else if(type==1){
+
+					float val=0;
+					val = (float)atof(cell);
+					ins->dec = val;
+				}
+
+				head = insertAtHead(ins, head);
+
 			}
 			else{
-				head = mergeSort(head, 2);
+
+
+				ins->word = strdup(cell);
+				head = insertAtHead(ins, head);
+
 			}
 
 
-			Node* ptr = head;
-			Node* prev = NULL;
+			id++;
 
 
-			pthread_mutex_lock(&lock);
+		}   
+	}
+	/* 0 for int, 2 for float, anything else for string */
 
-			int ctr=0;
-			while(ptr!=NULL){
-				ctr++;
-				printf("%s\n", strings[ptr->id]);
-			//	free(strings[ptr->id]);
-				prev = ptr;
-				ptr=ptr->next;
-				if(!isNumeric){
+
+	if(isFloat){
+		head = mergeSort(head, 1);
+	}
+	else if(isNumeric){
+		head = mergeSort(head, 0);
+	}
+	else{
+		head = mergeSort(head, 2);
+	}
+
+
+	Node* ptr = head;
+	Node* prev = NULL;
+
+
+	pthread_mutex_lock(&lock);
+
+	int ctr=0;
+	while(ptr!=NULL){
+		ctr++;
+		insertArr(strings[ptr->id]);
+		//	free(strings[ptr->id]);
+		prev = ptr;
+		ptr=ptr->next;
+		if(!isNumeric){
 			//		free(prev->word);
-				}
-			//	free(prev);
-			} 
-			pthread_mutex_unlock(&lock);
+		}
+		//	free(prev);
+	} 
+	pthread_mutex_unlock(&lock);
 
 
-		//	free(strings);
+	//	free(strings);
 
-		
-
-
-
-
-
-
-
-	
 	close(*mysock);
 	pthread_exit(0);
+}
+
+
+void dump(int * sock){
+
 }
 
 int main(int argc, char* argv[]){
@@ -220,6 +215,7 @@ int main(int argc, char* argv[]){
 	//int mysock;
 	char buff[1024];
 	int rval;
+	globArr = (char**)malloc(sizeof(char*) * 5000);
 	// create socket
 	sock = socket(AF_INET, SOCK_STREAM,0);
 	if(sock < 0){
@@ -252,6 +248,14 @@ int main(int argc, char* argv[]){
 			char ipstr[INET6_ADDRSTRLEN];
 			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof(ipstr));
 			//	printf("%s\n", ipstr);//ip address of the connection, store or print this, whatever
+			memset(buff,0,sizeof(buff));
+			if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+				                perror("reading stream message error");
+			else if(strcmp(buff,"dumpthatshit\n")){
+					//call dump
+					continue;
+				
+			}
 			pthread_t newthread;
 			if(ptr->curr == NULL){
 				//	pthread_t newthread;

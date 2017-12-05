@@ -241,7 +241,7 @@ int main(int argc, char* argv[]){
 	FILE* fp = fopen(outputfile, "wb");
 	fprintf(fp, "%s", globArr[0]);
 
-
+		//COPY STARTING FROM HERE
 
 	for(ctr=1;ctr<globArrEnd;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
@@ -316,7 +316,7 @@ int main(int argc, char* argv[]){
 	} 
 
 
-
+			//COPY ENDS HERE
 
 	pthread_mutex_unlock(&lock);
 
