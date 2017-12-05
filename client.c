@@ -204,6 +204,7 @@ void* sendFile(void* param){
 	char buff[1024];//used for the input
 	struct hostent *hp; //used for getting hostname
 
+
     sock = socket(AF_INET, SOCK_STREAM,0); //create socket
 
 	if(sock<0){
