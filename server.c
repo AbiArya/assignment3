@@ -5,6 +5,18 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include "sorter_thread.h"
+#include "mergesort.c"
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <pthread.h>
 #include "sorter_thread.h"
 
 void * sort(void *arg){
@@ -12,80 +24,77 @@ void * sort(void *arg){
 	int rval;
 	char buff[1024];
 	memset(buff,0,sizeof(buff));
+	int loop = 0;
+	char* row = NULL;
+
+
+
+	Node* head = (Node*)malloc(sizeof(Node));
+	int isNumeric = 1;
+	int id = 0;
+	head = NULL;
+
+	int stringCount = 1;
+	int stringCapacity = 10000; // current number of strings pointed to by char** string
+	char** strings = (char**)malloc(stringCapacity*sizeof(char*));
+
+
+	strings[id] = strdup(row);
+	char* cellWithSpaces = getCellAtInd(row,colNum);
+
+
+	//discern data type of sorting column
 	int i=0;
-	while(i==0){
+
+	int isFloat=0;
+
+
+	pthread_mutex_lock(&lock);
+	if(type == -1){
+
+		while(i < strlen(cellWithSpaces)){
+
+			if(!isdigit(cellWithSpaces[i])){
+				if(cellWithSpaces[i] == '.'){
+					isFloat = 1;
+					i++;
+					continue;
+				}
+				isNumeric = 0;
+				break;
+			} 
+			i++;
+
+		}
+
+		if(isFloat) type = 1;
+		else if(isNumeric) type = 0;
+		else type = 2;
+
+	}
+	pthread_mutex_unlock(&lock);
+
+
+
+
+
+
+
+
+
+	while(loop==0){
 		//		printf("in loop\n");
 		memset(buff,0,sizeof(buff));
 		if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
 			perror("reading stream message error");
 		else if(rval ==0){
 			//			printf("exit");
-			i=1;
+			loop=1;
 		}else{
-
-
-
-			colNum = getColNum(titleRow, colName);
-			if(colNum == -1){
-				printf("Error has occured.\n");
-				fclose(fp);        
-				pthread_exit(NULL);
-			}
-			pthread_mutex_unlock(&lock);
-			// find what column # the title is in
-
-			Node* head = (Node*)malloc(sizeof(Node));
-			int isNumeric = 1;
-			int id = 0;
-			head = NULL;
-
-			int stringCount = 1;
-			int stringCapacity = 10000; // current number of strings pointed to by char** string
-			char** strings = (char**)malloc(stringCapacity*sizeof(char*));
-
-
-			strings[id] = strdup(row);
-			char* cellWithSpaces = getCellAtInd(row,colNum);
-
-
-			//discern data type of sorting column
-			int i=0;
-
-			int isFloat=0;
-
-
-			pthread_mutex_lock(&lock);
-			if(type == -1){
-
-				while(i < strlen(cellWithSpaces)){
-
-					if(!isdigit(cellWithSpaces[i])){
-						if(cellWithSpaces[i] == '.'){
-							isFloat = 1;
-							i++;
-							continue;
-						}
-						isNumeric = 0;
-						break;
-					} 
-					i++;
-
-				}
-
-				if(isFloat) type = 1;
-				else if(isNumeric) type = 0;
-				else type = 2;
-
-			}
-			pthread_mutex_unlock(&lock);
-
-
-			// loop through each row and get the cell to sort
-			while(row!=NULL){
 
 				if(id!=0){
 
-					row = getRow(fp); //this is malloc'd...must free somewhere
+					row = buff;
 
 					stringCount++;
 					if(row==NULL) break;
@@ -102,8 +111,7 @@ void * sort(void *arg){
 				}
 				if(strcmp(cellWithSpaces, "Error") == 0){ 
 					printf("Error has occurred\n");
-					fclose(fp);
-					pthread_exit(NULL);
+					//DO ERROR SHIT
 
 				}
 				char* cell = trim(cellWithSpaces);
@@ -146,7 +154,6 @@ void * sort(void *arg){
 
 
 			}   
-			fclose(fp);
 
 			/* 0 for int, 2 for float, anything else for string */
 
