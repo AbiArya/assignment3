@@ -26,7 +26,12 @@ void * sort(void *arg){
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
-
+	int column = 0;
+        if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+                perror("reading stream message error");
+        else{
+                row = strdup(buff);
+        }
 
 
 	Node* head = (Node*)malloc(sizeof(Node));
@@ -40,8 +45,8 @@ void * sort(void *arg){
 
 
 	strings[id] = strdup(row);
-	char* cellWithSpaces = getCellAtInd(row,colNum);
-
+	char* cellWithSpaces = getCellAtInd(row,column);
+	id++;
 
 	//discern data type of sorting column
 	int i=0;
@@ -91,7 +96,8 @@ void * sort(void *arg){
 			//			printf("exit");
 			loop=1;
 		}else{
-
+			if(strcmp(buff,"stuff\n")==0)
+				break;
 				if(id!=0){
 
 					row = buff;
@@ -106,7 +112,7 @@ void * sort(void *arg){
 					}
 
 					strings[id] = strdup(row);
-					cellWithSpaces = getCellAtInd(row, colNum);//row is the full row, but the parameter to the function ends up being just "Color"
+					cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
 
 				}
 				if(strcmp(cellWithSpaces, "Error") == 0){ 
@@ -154,7 +160,7 @@ void * sort(void *arg){
 
 
 			}   
-
+	}
 			/* 0 for int, 2 for float, anything else for string */
 
 
@@ -178,20 +184,21 @@ void * sort(void *arg){
 			int ctr=0;
 			while(ptr!=NULL){
 				ctr++;
-				free(strings[ptr->id]);
+				printf("%s\n", strings[ptr->id]);
+			//	free(strings[ptr->id]);
 				prev = ptr;
 				ptr=ptr->next;
 				if(!isNumeric){
-					free(prev->word);
+			//		free(prev->word);
 				}
-				free(prev);
+			//	free(prev);
 			} 
 			pthread_mutex_unlock(&lock);
 
 
-			free(strings);
+		//	free(strings);
 
-		}
+		
 
 
 
