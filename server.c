@@ -46,12 +46,14 @@ int recvall(int socket, void *buffer, size_t length, int flags){
 	{
 		//	printf("IN WHILE\n");
 		n = recv(socket, p, length, flags);
-		if (n <= 0)
+		if (n == 0)
+			break;
+		else if(n<0)
 			return -1;
 		p += n;
 		length -= n;
 		if(strstr(buffer,"srisrisri")!=NULL){
-			printf("BREAK\n");
+//			printf("BREAK\n");
 			printf("%s\n", buffer);
 			break;
 		}
@@ -76,13 +78,13 @@ void * sort(void *arg){
 	//column = atoi(buff);//should be column number
 	}*/
 
-	printf("%i\n", column);
+	//printf("%i\n", column);
 	if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
 	else{
 		row = strdup(buff);//should be column number
 	}
-	printf("after row\n");
+	//printf("after row\n");
 
 
 	Node* head = (Node*)malloc(sizeof(Node));
@@ -128,17 +130,17 @@ void * sort(void *arg){
 
 	}
 	pthread_mutex_unlock(&lock);
-	printf("OUTSIDE LOOP=0\n");
+	//printf("OUTSIDE LOOP=0\n");
 
 	while(loop==0){
 		//printf("in loop\n");
 		memset(buff,0,sizeof(buff));
 		if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 			perror("reading stream message error");
-		else if(rval ==1){
-			//			printf("exit");
-			loop=1;
-		}else{
+//		else if(rval ==1){
+//			//			printf("exit");
+//}			loop=1;
+		else{
 			if(strcmp(buff,"borisonufriyev\n")==0)
 				break;
 			if(id!=0){
