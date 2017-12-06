@@ -54,7 +54,7 @@ int recvall(int socket, void *buffer, size_t length, int flags){
 		length -= n;
 		if(strstr(buffer,"srisrisri")!=NULL){
 //			printf("BREAK\n");
-			printf("%s\n", buffer);
+			//printf("%s\n", buffer);
 			break;
 		}
 		//printf("IN WHILE\n");
@@ -71,7 +71,7 @@ void * sort(void *arg){
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
-	int column = 0;
+	int column = 1;
 	/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
 		else{
@@ -141,7 +141,7 @@ void * sort(void *arg){
 //			//			printf("exit");
 //}			loop=1;
 		else{
-			if(strcmp(buff,"borisonufriyev\n")==0)
+			if(strstr(buff,"borisonufriyev")!=NULL)
 				break;
 			if(id!=0){
 
@@ -206,6 +206,7 @@ void * sort(void *arg){
 
 		}   
 	}
+	printf("OUT OF THE LOOP\n");
 	/* 0 for int, 2 for float, anything else for string */
 
 
@@ -229,6 +230,7 @@ void * sort(void *arg){
 	int ctr=0;
 	while(ptr!=NULL){
 		ctr++;
+		printf("%s\n", strings[ptr->id]);
 		insertArr(strings[ptr->id]);
 		//	free(strings[ptr->id]);
 		prev = ptr;
