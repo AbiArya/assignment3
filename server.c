@@ -17,28 +17,72 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <pthread.h>
-#include "sorter_thread.h"
+//#include "sorter_thread.h"
+#include "client.h"
+
+
+void insertArr(char* str){
+
+	if(globArrEnd + 10 > numElems){
+
+		globArr = moreCapacity(globArr, numElems);
+		numElems *= 1.5;
+	}
+
+
+	globArr[globArrEnd] = strdup(str);
+	globArrEnd++;
+
+
+
+
+}
+
+
+int recvall(int socket, void *buffer, size_t length, int flags){
+	ssize_t n;
+	char *p = buffer;
+	while (length > 0)
+	{
+		//	printf("IN WHILE\n");
+		n = recv(socket, p, length, flags);
+		if (n <= 0)
+			return -1;
+		p += n;
+		length -= n;
+		if(strstr(buffer,"srisrisri")!=NULL){
+			printf("BREAK\n");
+			printf("%s\n", buffer);
+			break;
+		}
+		//printf("IN WHILE\n");
+		fflush(stdout);
+	}
+	return 1;
+}
+
 
 void * sort(void *arg){
 	int * mysock = (int*)arg;
 	int rval;
-	char buff[1024];
+	char buff[10000];
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
 	int column = 0;
-	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+	/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
-	else{
-		column = atoi(buff);//should be column number
-	}
+		else{
+	//column = atoi(buff);//should be column number
+	}*/
+
 	printf("%i\n", column);
-	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+	if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
 	else{
 		row = strdup(buff);//should be column number
 	}
-
+	printf("after row\n");
 
 
 	Node* head = (Node*)malloc(sizeof(Node));
@@ -84,14 +128,14 @@ void * sort(void *arg){
 
 	}
 	pthread_mutex_unlock(&lock);
-
+	printf("OUTSIDE LOOP=0\n");
 
 	while(loop==0){
-		//		printf("in loop\n");
+		//printf("in loop\n");
 		memset(buff,0,sizeof(buff));
-		if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+		if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 			perror("reading stream message error");
-		else if(rval ==0){
+		else if(rval ==1){
 			//			printf("exit");
 			loop=1;
 		}else{
@@ -249,13 +293,13 @@ int main(int argc, char* argv[]){
 			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof(ipstr));
 			//	printf("%s\n", ipstr);//ip address of the connection, store or print this, whatever
 			memset(buff,0,sizeof(buff));
-			if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
-				                perror("reading stream message error");
-			else if(strcmp(buff,"dumpthatshit\n")){
-					//call dump
-					continue;
-				
-			}
+			/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+				perror("reading stream message error");
+				else if(strcmp(buff,"dumpthatshit\n")){
+			//call dump
+			continue;
+
+			}*/
 			pthread_t newthread;
 			if(ptr->curr == NULL){
 				//	pthread_t newthread;

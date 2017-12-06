@@ -7,6 +7,27 @@
 #include <unistd.h>
 #include <netdb.h>
 #define DATA "hello word of socket"
+//#include "sorter_thread.h"
+#include <sys/stat.h>
+#include <dirent.h>
+#include <syscall.h>
+
+int sendall(int socket, const void *buffer, size_t length, int flags){
+    ssize_t n;
+    const char *p = buffer;
+    while (length > 0)
+    {
+        n = send(socket, p, length, flags);
+        if (n <= 0)
+            return -1;
+        p += n;
+        length -= n;
+    }
+	//send(socket,"srisrisri", strlen("srisrisri"),0);
+    return 0;
+}
+
+
 int main(int argc, char* argv[]){
 	int sock; //the output of method socket()
 	struct sockaddr_in server;// socket struct
@@ -42,17 +63,32 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 
-	while(1){
+	/*	while(1){
 		printf("enter the message: ");
 		fgets(buff, 1023, stdin);
 
 		if(send(sock, buff,(sizeof(buff)), 0)<0){
-			perror("send failed");
-			exit(1);	
+		perror("send failed");
+		exit(1);	
 		}
 		printf("sent message");
+		}*/
+	char * fileName = "movie_metadata.csv";
+	FILE* fp = fopen(fileName, "r+");
+	char line[10000];
+	while(fgets(line,sizeof line, fp)!=NULL){
+		strcat(line,"srisrisri");
+		sendall(sock,strdup(line),strlen(line),0);
+		//printf("%s\n",line);
+		
 	}
-	close(sock);
+	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
-	return 0;
+
+
+
+
+//close(sock);
+
+return 0;
 }
