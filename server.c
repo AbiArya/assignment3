@@ -20,7 +20,6 @@
 //#include "sorter_thread.h"
 #include "client.h"
 
-
 void insertArr(char* str){
 
 	if(globArrEnd + 10 > numElems){
@@ -42,7 +41,7 @@ void insertArr(char* str){
 int recvall(int socket, void *buffer, size_t length, int flags){
 	ssize_t n;
 	char *p = buffer;
-	while (length > 0)
+	while (length>0)
 	{
 		//	printf("IN WHILE\n");
 		n = recv(socket, p, length, flags);
@@ -54,12 +53,12 @@ int recvall(int socket, void *buffer, size_t length, int flags){
 		length -= n;
 		if(strstr(buffer,"srisrisri")!=NULL){
 //			printf("BREAK\n");
-			//printf("%s\n", buffer);
 			break;
 		}
 		//printf("IN WHILE\n");
 		fflush(stdout);
 	}
+	send(socket,"ack", strlen("ack"),0);
 	return 1;
 }
 
@@ -131,9 +130,10 @@ void * sort(void *arg){
 	}
 	pthread_mutex_unlock(&lock);
 	//printf("OUTSIDE LOOP=0\n");
-
+	int letscount=0;
 	while(loop==0){
 		//printf("in loop\n");
+	//	letscount++;
 		memset(buff,0,sizeof(buff));
 		if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 			perror("reading stream message error");
@@ -141,12 +141,14 @@ void * sort(void *arg){
 //			//			printf("exit");
 //}			loop=1;
 		else{
+			letscount+=1;
 			if(strstr(buff,"borisonufriyev")!=NULL)
 				break;
 			if(id!=0){
-
+			//	printf("\nBREAAAAAK\n");
+				printf("\n%s\n",buff);	
+			//	printf("\nBREAAAAK\n");		
 				row = buff;
-
 				stringCount++;
 				if(row==NULL) break;
 
@@ -157,10 +159,10 @@ void * sort(void *arg){
 				}
 
 				strings[id] = strdup(row);
-				cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
-
+		//		cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
+				insertArr(strdup(strings[id]));
 			}
-			if(strcmp(cellWithSpaces, "Error") == 0){ 
+		/*	if(strcmp(cellWithSpaces, "Error") == 0){ 
 				printf("Error has occurred\n");
 				//DO ERROR SHIT
 
@@ -199,17 +201,16 @@ void * sort(void *arg){
 				head = insertAtHead(ins, head);
 
 			}
-
+			
 
 			id++;
-
+			*/
 
 		}   
 	}
 	printf("OUT OF THE LOOP\n");
 	/* 0 for int, 2 for float, anything else for string */
-
-
+/*
 	if(isFloat){
 		head = mergeSort(head, 1);
 	}
@@ -219,7 +220,7 @@ void * sort(void *arg){
 	else{
 		head = mergeSort(head, 2);
 	}
-
+*/
 
 	Node* ptr = head;
 	Node* prev = NULL;
@@ -228,9 +229,9 @@ void * sort(void *arg){
 	pthread_mutex_lock(&lock);
 
 	int ctr=0;
-	while(ptr!=NULL){
+/*	while(ptr!=NULL){
 		ctr++;
-		printf("%s\n", strings[ptr->id]);
+//		printf("%s\n", strings[ptr->id]);
 		insertArr(strings[ptr->id]);
 		//	free(strings[ptr->id]);
 		prev = ptr;
@@ -241,10 +242,9 @@ void * sort(void *arg){
 		//	free(prev);
 	} 
 	pthread_mutex_unlock(&lock);
-
+*/
 
 	//	free(strings);
-
 	close(*mysock);
 	pthread_exit(0);
 }
@@ -312,6 +312,7 @@ int main(int argc, char* argv[]){
 				ptr = ptr->next;
 			}
 			pthread_create(&newthread, NULL, sort, (void*)mysock);			
+	//		sort((void*) mysock);
 		}	
 	}while(1);	
 

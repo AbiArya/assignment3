@@ -23,7 +23,9 @@ int sendall(int socket, const void *buffer, size_t length, int flags){
         p += n;
         length -= n;
     }
-	//send(socket,"srisrisri", strlen("srisrisri"),0);
+	send(socket,"srisrisri", strlen("srisrisri"),0);
+	char tmp [15];
+	recv(socket,tmp,15,0);
     return 0;
 }
 
@@ -76,14 +78,17 @@ int main(int argc, char* argv[]){
 	char * fileName = "movie_metadata.csv";
 	FILE* fp = fopen(fileName, "r+");
 	char line[10000];
+	int stuff=0;
 	while(fgets(line,sizeof line, fp)!=NULL){
-		strcat(line,"srisrisri");
+	//	strcat(line,"srisrisri");
 		sendall(sock,strdup(line),strlen(line),0);
 		//printf("%s\n",line);
-		
+		stuff++;
+		memset(line,0,strlen(line));	
 	}
+	sleep(10);
 	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
-
+	printf("%i\n", stuff);
 
 
 
