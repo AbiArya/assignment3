@@ -228,28 +228,32 @@ void* sendFile(void* param){
 	}
 
     char* row = getRow(fp);
+    char colLine[100];
+
+    pthread_mutex_lock(&lock);
+    char num = colNum + '0'; 
+    pthread_mutex_unlock(&lock);
+
+    // send col num
+    colLine[0] = num;
+    strcat(colLine, "srisrisri");
+    sendall(sock,strdup(colLine),strlen(colLine),0);
+
     // loop through each row and send to socket 
     while(row!=NULL){
+        
+
+        char line[10000];
+        strcat(line, row);
+        strcat(line,"srisrisri");
+        sendall(sock,strdup(line),strlen(line),0);        
         row = getRow(fp);
-        // send column number 
-
-        // sending each line to socket goes here
-        /*
-        printf("enter the message: ");
-        fgets(buff, 1023, stdin);
-
-        if(send(sock, buff,(sizeof(buff)), 0)<0){
-            perror("send failed");
-            exit(1);	
-        }
-        */
-
-
-        // send end signal
 
     }
-    fclose(fp);
+    // send eof signal
+    sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
+    fclose(fp);
     printf("sent message");
     close(sock);
 
@@ -257,6 +261,22 @@ void* sendFile(void* param){
     pthread_exit(NULL);
     return 0;
 }
+
+int sendall(int socket, const void *buffer, size_t length, int flags){
+    ssize_t n;
+    const char *p = buffer;
+    while (length > 0)
+    {
+        n = send(socket, p, length, flags);
+        if (n <= 0)
+            return -1;
+        p += n;
+        length -= n;
+    }
+	//send(socket,"srisrisri", strlen("srisrisri"),0);
+    return 0;
+}
+
 
 
 

@@ -40,6 +40,8 @@ char* getRow(FILE*);
 int getColNum(char*, char*);
 void* sendFile(void*);
 void* traverse(void*);
+int sendall(int, const void*, size_t, int);
+
 
 // methods
 
