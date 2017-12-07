@@ -32,9 +32,9 @@ int main(int argc, char* argv[]){
     }
     
     if(argc == 7){
-        colName = argv[3];
-        hostname = argv[5];
-        portno = atoi(argv[7]);
+        colName = argv[2];
+        hostname = argv[4];
+        portno = atoi(argv[6]);
     }
 
     if(pthread_mutex_init(&lock, NULL)==-1) printf("mutex failed\n"); 
@@ -244,6 +244,7 @@ void* sendFile(void* param){
         
 
         char line[10000];
+	memset(line,0,sizeof(line));
         strcat(line, row);
         strcat(line,"srisrisri");
         sendall(sock,strdup(line),strlen(line),0);        
@@ -251,6 +252,7 @@ void* sendFile(void* param){
 
     }
     // send eof signal
+    sleep(5);
     sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
     fclose(fp);

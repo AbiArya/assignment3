@@ -129,27 +129,23 @@ void * sort(void *arg){
 
 	}
 	pthread_mutex_unlock(&lock);
-	//printf("OUTSIDE LOOP=0\n");
-	int letscount=0;
+
+
 	while(loop==0){
-		//printf("in loop\n");
-	//	letscount++;
+
+
 		memset(buff,0,sizeof(buff));
 		if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
 			perror("reading stream message error");
-//		else if(rval ==1){
-//			//			printf("exit");
-//}			loop=1;
+
 		else{
-			letscount+=1;
 			if(strstr(buff,"borisonufriyev")!=NULL)
 				break;
 			if(id!=0){
-			//	printf("\nBREAAAAAK\n");
+
 				printf("\n%s\n",buff);	
-			//	printf("\nBREAAAAK\n");		
+
 				row = buff;
-				stringCount++;
 				if(row==NULL) break;
 
 				if(stringCount == stringCapacity - 100){
@@ -158,93 +154,18 @@ void * sort(void *arg){
 					stringCapacity = stringCapacity*1.5;
 				}
 
-				strings[id] = strdup(row);
-		//		cellWithSpaces = getCellAtInd(row, column);//row is the full row, but the parameter to the function ends up being just "Color"
-				insertArr(strdup(strings[id]));
+				insertArr(strdup(row));
 			}
-		/*	if(strcmp(cellWithSpaces, "Error") == 0){ 
-				printf("Error has occurred\n");
-				//DO ERROR SHIT
+		
 
-			}
-			char* cell = trim(cellWithSpaces);
-
-			//inserting the data in the column we're sorting by into a linked list
-
-			Node* ins = (Node*)malloc(sizeof(Node));
-			ins->id = id;
-
-
-			if(type!=2){
-
-				if(type == 0){
-
-
-					int val=0;
-					sscanf(cell, "%d", &val); //parse int		
-					ins->number = val;
-				}
-				else if(type==1){
-
-					float val=0;
-					val = (float)atof(cell);
-					ins->dec = val;
-				}
-
-				head = insertAtHead(ins, head);
-
-			}
-			else{
-
-
-				ins->word = strdup(cell);
-				head = insertAtHead(ins, head);
-
-			}
-			
-
-			id++;
-			*/
-
+	
 		}   
 	}
-	printf("OUT OF THE LOOP\n");
-	/* 0 for int, 2 for float, anything else for string */
-/*
-	if(isFloat){
-		head = mergeSort(head, 1);
-	}
-	else if(isNumeric){
-		head = mergeSort(head, 0);
-	}
-	else{
-		head = mergeSort(head, 2);
-	}
-*/
-
-	Node* ptr = head;
-	Node* prev = NULL;
-
 
 	pthread_mutex_lock(&lock);
 
-	int ctr=0;
-/*	while(ptr!=NULL){
-		ctr++;
-//		printf("%s\n", strings[ptr->id]);
-		insertArr(strings[ptr->id]);
-		//	free(strings[ptr->id]);
-		prev = ptr;
-		ptr=ptr->next;
-		if(!isNumeric){
-			//		free(prev->word);
-		}
-		//	free(prev);
-	} 
-	pthread_mutex_unlock(&lock);
-*/
 
-	//	free(strings);
+
 	close(*mysock);
 	pthread_exit(0);
 }
