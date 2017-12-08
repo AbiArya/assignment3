@@ -25,7 +25,7 @@ int sendall(int socket, const void *buffer, size_t length, int flags){
     }
 	send(socket,"srisrisri", strlen("srisrisri"),0);
 	char tmp [15];
-	recv(socket,tmp,15,0);
+	//recv(socket,tmp,15,0);
     return 0;
 }
 
