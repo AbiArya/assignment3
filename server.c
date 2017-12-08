@@ -19,7 +19,6 @@
 #include <pthread.h>
 //#include "sorter_thread.h"
 #include "client.h"
-
 void insertArr(char* str){
 
 	if(globArrEnd + 10 > numElems){
@@ -38,39 +37,57 @@ void insertArr(char* str){
 }
 
 
-int recvall(int socket, void *buffer, size_t length, int flags){
+char* recvall(int socket, void *buffer, size_t length, int flags,char *rval){
 	ssize_t n;
 	char *p = buffer;
-	while (length>0)
+	char * remainder;
+	while (strstr(buffer,"srisrisri")==NULL)
 	{
-		//	printf("IN WHILE\n");
 		n = recv(socket, p, length, flags);
 		if (n == 0)
 			break;
 		else if(n<0)
-			return -1;
+			return "ERROR";
 		p += n;
 		length -= n;
-		if(strstr(buffer,"srisrisri")!=NULL){
-//			printf("BREAK\n");
-			break;
-		}
-		//printf("IN WHILE\n");
-		fflush(stdout);
 	}
-	send(socket,"ack", strlen("ack"),0);
-	return 1;
+
+	remainder = buffer;
+	char *stuff = buffer;
+	char * print;
+	int todo=0;
+	if(strlen(rval)!=0)
+		todo=1;
+	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
+		if(todo==1){
+			print = malloc(sizeof(char)*(stuff-remainder) + sizeof(char)*strlen(rval));
+			strcpy(print,rval);
+			strncpy(print,remainder,(stuff-remainder));
+
+			todo=0;
+		}else{		
+			print = malloc(sizeof(char)*(stuff-remainder));
+			strncpy(print,remainder,(stuff-remainder));
+				printf("\nWOWOOOOOOOORDS\n");
+				printf("%s\n",print);
+				printf("\n WOEWORJWLJFDLKSJFLEWJRLJDJFKLJ\n");
+		}
+		insertArr(strdup(print));
+		remainder = remainder + (stuff-remainder)+9;
+	}
+	return remainder;
 }
 
 
 void * sort(void *arg){
 	int * mysock = (int*)arg;
-	int rval;
+	char * rval=NULL;
 	char buff[10000];
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
 	int column = 1;
+	char * leftover="";
 	/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
 		else{
@@ -78,7 +95,7 @@ void * sort(void *arg){
 	}*/
 
 	//printf("%i\n", column);
-	if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
+	if(strcmp((rval = recvall(*mysock,buff,sizeof(buff),0,leftover)),"ERROR")==0)
 		perror("reading stream message error");
 	else{
 		row = strdup(buff);//should be column number
@@ -135,7 +152,7 @@ void * sort(void *arg){
 
 
 		memset(buff,0,sizeof(buff));
-		if((rval = recvall(*mysock,buff,sizeof(buff),0))<0)
+		if(strcmp((rval = recvall(*mysock,buff,sizeof(buff),0,rval)),"ERROR")==0)
 			perror("reading stream message error");
 
 		else{
@@ -143,7 +160,7 @@ void * sort(void *arg){
 				break;
 			if(id!=0){
 
-				printf("\n%s\n",buff);	
+				//	printf("\n%s\n",buff);	
 
 				row = buff;
 				if(row==NULL) break;
@@ -154,17 +171,16 @@ void * sort(void *arg){
 					stringCapacity = stringCapacity*1.5;
 				}
 
-				insertArr(strdup(row));
+				//	insertArr(strdup(row));
 			}
-		
 
-	
+
+
 		}   
 	}
 
 	pthread_mutex_lock(&lock);
-
-
+	printf(rval);
 
 	close(*mysock);
 	pthread_exit(0);
@@ -233,7 +249,7 @@ int main(int argc, char* argv[]){
 				ptr = ptr->next;
 			}
 			pthread_create(&newthread, NULL, sort, (void*)mysock);			
-	//		sort((void*) mysock);
+			//		sort((void*) mysock);
 		}	
 	}while(1);	
 
