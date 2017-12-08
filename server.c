@@ -19,6 +19,7 @@
 #include <pthread.h>
 //#include "sorter_thread.h"
 #include "client.h"
+int maxnum=0;
 void insertArr(char* str){
 
 	if(globArrEnd + 10 > numElems){
@@ -67,15 +68,16 @@ char* recvall(int socket, void *buffer, size_t length, int flags,char *rval){
 		print = malloc(sizeof(char)*(stuff-remainder));
 		strncpy(print,remainder,(stuff-remainder));
 
-		while(((!isdigit(print[strlen(print)-1])) && (print[strlen(print)-1]!=','))){
+	/*	while(((!isdigit(print[strlen(print)-1])) && (print[strlen(print)-1]!=','))){
                         	char * tmpstring = malloc(sizeof(char) * strlen(print));
                         	strncpy(tmpstring,print,strlen(print)-1);
                         	print = tmpstring;
                 
         	}
-
+*/
 
 		printf("%s\n",print);
+		maxnum+=1;
 		printf("DONEZOOO\n");
 		insertArr(strdup(print));
 		remainder = remainder + (stuff-remainder)+9;
@@ -197,8 +199,7 @@ void * sort(void *arg){
 	}
 
 	pthread_mutex_lock(&lock);
-	printf(rval);
-
+printf("%i\n", maxnum);	
 	close(*mysock);
 	pthread_exit(0);
 }
