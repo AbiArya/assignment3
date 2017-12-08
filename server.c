@@ -20,6 +20,9 @@
 //#include "sorter_thread.h"
 #include "client.h"
 int maxnum=0;
+
+void dump(int*, int);
+
 void insertArr(char* str){
 
 	if(globArrEnd + 10 > numElems){
@@ -80,9 +83,9 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 			print[strlen(print)-num]='\0';
 			num+=1;
 		}*/
-		printf("%s\n",print);
+		/*printf("%s\n",print);
 		maxnum+=1;
-		printf("DONEZOOO\n");
+		printf("DONEZOOO\n");*/
 		insertArr(strdup(print));
 		remainder = remainder + (stuff-remainder)+9;
 	}
@@ -126,6 +129,7 @@ void * sort(void *arg){
 	}
 	//printf("after row\n");
 	printf("%i\n", atoi(colNum));
+	int col = atoi(colNum);
 
 	Node* head = (Node*)malloc(sizeof(Node));
 	int isNumeric = 1;
@@ -203,13 +207,104 @@ void * sort(void *arg){
 	}
 
 	pthread_mutex_lock(&lock);
-printf("%i\n", maxnum);	
+	printf("%i\n", maxnum);	
+	dump(mysock, 1); //just testing on director_name
 	close(*mysock);
 	pthread_exit(0);
 }
 
 
-void dump(int * sock){
+void dump(int * sock, int colNum){
+	
+	printf("%s", globArr[0]);
+
+		//COPY STARTING FROM HERE
+	int ctr;
+	Node* head = NULL;
+
+	for(ctr=1;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
+
+		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
+
+		if(strcmp(cellWithSpaces, "Error") == 0){
+			printf("Error has occurred\n");
+			pthread_exit(NULL);
+		}
+		char* cell = trim(cellWithSpaces);
+
+
+
+		//inserting the data in the column we're sorting by into a linked list
+
+		Node* ins = (Node*)malloc(sizeof(Node));
+		ins->id = ctr;
+
+
+		if(type==0){
+
+			int val;
+			sscanf(cell, "%d", &val); //parse int		
+			ins->number = val;
+		}
+		else if(type==1){
+			float val;
+			val = (float)atof(cell);
+			ins->dec = val;
+		}
+		else if(type==2){
+
+			ins->word = strdup(cell);
+
+		}
+		else{
+			printf("type not right\n");
+			return;
+
+		}
+
+		head = insertAtHead(ins, head);
+	}
+
+
+	if(type==1){
+		head = mergeSort(head, 1);
+	}
+	else if(type==0){
+		head = mergeSort(head, 0);
+	}
+	else if(type==2){
+		head = mergeSort(head, 2);
+	}
+	else{
+		printf("\ninvalid sort type\n");
+
+	}
+
+	Node* ptr = head;
+	Node* prev = NULL;
+
+
+	while(ptr!=NULL){
+		printf("%s", globArr[ptr->id]);
+		free(globArr[ptr->id]);
+		prev = ptr;
+		ptr=ptr->next;
+		free(prev);
+	} 
+
+
+			//COPY ENDS HERE
+
+	pthread_mutex_unlock(&lock);
+
+
+
+
+	
+
+
+
+
 
 }
 
