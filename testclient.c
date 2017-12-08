@@ -79,6 +79,8 @@ int main(int argc, char* argv[]){
 	FILE* fp = fopen(fileName, "r+");
 	char line[10000];
 	int stuff=0;
+	char* colNum = "12";
+	sendall(sock,colNum,strlen(colNum),0);
 	while(fgets(line,sizeof line, fp)!=NULL){
 	//	strcat(line,"srisrisri");
 		sendall(sock,strdup(line),strlen(line),0);

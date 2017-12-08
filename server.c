@@ -52,42 +52,60 @@ char* recvall(int socket, void *buffer, size_t length, int flags,char *rval){
 		length -= n;
 	}
 
-	remainder = buffer;
 	char *stuff = buffer;
 	char * print;
-	int todo=0;
-	if(strlen(rval)!=0)
-		todo=1;
-	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
-		if(todo==1){
-			print = malloc(sizeof(char)*(stuff-remainder) + sizeof(char)*strlen(rval));
-			strcpy(print,rval);
-			strncpy(print,remainder,(stuff-remainder));
+	if(strlen(rval)!=0){
+		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
+		strcat(remainder, rval);
+		strcat(remainder,buffer);
+	}else{
+		remainder=buffer;
 
-			todo=0;
-		}else{		
-			print = malloc(sizeof(char)*(stuff-remainder));
-			strncpy(print,remainder,(stuff-remainder));
-				printf("\nWOWOOOOOOOORDS\n");
-				printf("%s\n",print);
-				printf("\n WOEWORJWLJFDLKSJFLEWJRLJDJFKLJ\n");
-		}
+	}
+	
+	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
+		print = malloc(sizeof(char)*(stuff-remainder));
+		strncpy(print,remainder,(stuff-remainder));
+
+		while(((!isdigit(print[strlen(print)-1])) && (print[strlen(print)-1]!=','))){
+                        	char * tmpstring = malloc(sizeof(char) * strlen(print));
+                        	strncpy(tmpstring,print,strlen(print)-1);
+                        	print = tmpstring;
+                
+        	}
+
+
+		printf("%s\n",print);
+		printf("DONEZOOO\n");
 		insertArr(strdup(print));
 		remainder = remainder + (stuff-remainder)+9;
 	}
+	/*while(strlen(remainder)>0){
+		if(!isdigit(remainder[strlen(remainder)-1]) && (remainder[strlen(remainder)-1]!=',')){
+			char * tmpstring = malloc((sizeof(char) * strlen(remainder)) -1);
+			strncpy(tmpstring,remainder,strlen(remainder)-1);
+			remainder = tmpstring;
+		}else{
+			break;
+		}
+	}*/
+
 	return remainder;
 }
 
 
 void * sort(void *arg){
 	int * mysock = (int*)arg;
-	char * rval=NULL;
+	char * rval="";
 	char buff[10000];
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
 	int column = 1;
-	char * leftover="";
+	int Number;
+	char *colNum = malloc(sizeof(char)*2);
+	char * leftover = malloc(sizeof(char)*10000);
+	leftover="";
 	/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
 		perror("reading stream message error");
 		else{
@@ -95,13 +113,13 @@ void * sort(void *arg){
 	}*/
 
 	//printf("%i\n", column);
-	if(strcmp((rval = recvall(*mysock,buff,sizeof(buff),0,leftover)),"ERROR")==0)
+	if(((Number = recv(*mysock,colNum,sizeof(colNum),0)))<0)
 		perror("reading stream message error");
 	else{
 		row = strdup(buff);//should be column number
 	}
 	//printf("after row\n");
-
+	printf("%i\n", atoi(colNum));
 
 	Node* head = (Node*)malloc(sizeof(Node));
 	int isNumeric = 1;
@@ -146,22 +164,21 @@ void * sort(void *arg){
 
 	}
 	pthread_mutex_unlock(&lock);
-
+	memset(leftover,0,strlen(leftover));
 
 	while(loop==0){
 
 
 		memset(buff,0,sizeof(buff));
-		if(strcmp((rval = recvall(*mysock,buff,sizeof(buff),0,rval)),"ERROR")==0)
+		if(strcmp((rval = recvall(*mysock,buff,sizeof(buff),0,leftover)),"ERROR")==0)
 			perror("reading stream message error");
 
 		else{
 			if(strstr(buff,"borisonufriyev")!=NULL)
 				break;
 			if(id!=0){
-
-				//	printf("\n%s\n",buff);	
-
+				//memset(leftover, 0, sizeof(leftover));
+				leftover=strdup(rval);
 				row = buff;
 				if(row==NULL) break;
 
