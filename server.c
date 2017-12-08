@@ -74,15 +74,18 @@ char* recvall(int socket, void *buffer, size_t length, int flags,char *rval){
                         	print = tmpstring;
                 
         	}
-*/
-
+*/		int num=1;
+	/*	while(strstr(print,"\n")!=NULL){
+			print[strlen(print)-num]='\0';
+			num+=1;
+		}*/
 		printf("%s\n",print);
 		maxnum+=1;
 		printf("DONEZOOO\n");
 		insertArr(strdup(print));
 		remainder = remainder + (stuff-remainder)+9;
 	}
-	/*while(strlen(remainder)>0){
+	while(strlen(remainder)>0){
 		if(!isdigit(remainder[strlen(remainder)-1]) && (remainder[strlen(remainder)-1]!=',')){
 			char * tmpstring = malloc((sizeof(char) * strlen(remainder)) -1);
 			strncpy(tmpstring,remainder,strlen(remainder)-1);
@@ -90,7 +93,7 @@ char* recvall(int socket, void *buffer, size_t length, int flags,char *rval){
 		}else{
 			break;
 		}
-	}*/
+	}
 
 	return remainder;
 }
