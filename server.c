@@ -72,32 +72,13 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 		print = malloc(sizeof(char)*(stuff-remainder) +1);
 		strncpy(print,remainder,(stuff-remainder));
 		print[strlen(print)]='\0';
-	/*	while(((!isdigit(print[strlen(print)-1])) && (print[strlen(print)-1]!=','))){
-                        	char * tmpstring = malloc(sizeof(char) * strlen(print));
-                        	strncpy(tmpstring,print,strlen(print)-1);
-                        	print = tmpstring;
-                
-        	}
-*/		int num=1;
-	/*	while(strstr(print,"\n")!=NULL){
-			print[strlen(print)-num]='\0';
-			num+=1;
-		}*/
-		/*printf("%s\n",print);
-		maxnum+=1;
-		printf("DONEZOOO\n");*/
+
+		
 		insertArr(strdup(print));
+		//free(print); //causes weird printing error
 		remainder = remainder + (stuff-remainder)+9;
 	}
-/*	while(strlen(remainder)>0){
-		if(!isdigit(remainder[strlen(remainder)-1]) && (remainder[strlen(remainder)-1]!=',')){
-			char * tmpstring = malloc((sizeof(char) * strlen(remainder)) -1);
-			strncpy(tmpstring,remainder,strlen(remainder)-1);
-			remainder = tmpstring;
-		}else{
-			break;
-		}
-	}*/
+
 
 	return remainder;
 }
@@ -131,17 +112,12 @@ void * sort(void *arg){
 	printf("%i\n", atoi(colNum));
 	int col = atoi(colNum);
 
-	Node* head = (Node*)malloc(sizeof(Node));
+
 	int isNumeric = 1;
 	int id = 0;
-	head = NULL;
-
-	int stringCount = 1;
-	int stringCapacity = 10000; // current number of strings pointed to by char** string
-	char** strings = (char**)malloc(stringCapacity*sizeof(char*));
 
 
-	strings[id] = strdup(row);
+	
 	char* cellWithSpaces = getCellAtInd(row,column);
 	id++;
 
@@ -192,11 +168,7 @@ void * sort(void *arg){
 				row = buff;
 				if(row==NULL) break;
 
-				if(stringCount == stringCapacity - 100){
-
-					strings = moreCapacity(strings, stringCapacity);
-					stringCapacity = stringCapacity*1.5;
-				}
+			
 
 				//	insertArr(strdup(row));
 			}
@@ -206,7 +178,6 @@ void * sort(void *arg){
 		}   
 	}
 
-	pthread_mutex_lock(&lock);
 	printf("%i\n", maxnum);	
 	dump(mysock, 1); //just testing on director_name
 	close(*mysock);
@@ -214,14 +185,27 @@ void * sort(void *arg){
 }
 
 
+/*
+
+
+
+***need to generate output file name to write to****
+
+
+
+*/
+
+
+
 void dump(int * sock, int colNum){
 	
 	printf("%s", globArr[0]);
 
-		//COPY STARTING FROM HERE
+
 	int ctr;
 	Node* head = NULL;
 
+	pthread_mutex_lock(&lock);
 	for(ctr=1;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
 		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
@@ -292,8 +276,6 @@ void dump(int * sock, int colNum){
 		free(prev);
 	} 
 
-
-			//COPY ENDS HERE
 
 	pthread_mutex_unlock(&lock);
 
