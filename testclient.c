@@ -50,7 +50,7 @@ int main(int argc, char* argv[]){
 	}
 	int portno = atoi(argv[6]); //turns input port number to an int
 	server.sin_family = AF_INET; //the address family, AF_INET seems to be standard
-	printf(argv[4]);
+//	printf(argv[4]);
 	hp = gethostbyname(argv[4]); //get the hostname from input, and give it to hp using gethostbyname
 	if(hp == 0){
 		perror("get hostbyname failed");
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]){
 	}
 	sleep(10);
 	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
-	printf("%i\n", stuff);
+//	printf("%i\n", stuff);
 
 
 
