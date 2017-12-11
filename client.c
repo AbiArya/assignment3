@@ -662,8 +662,8 @@ void* sendFile(void* param){
 	// send col num
 	colLine[0] = num;
 	sendall(sock,"s", strlen("s"),0);
-	strcat(colLine, "srisrisri");
-	sendall(sock,strdup(colLine),strlen(colLine),0);
+//	strcat(colLine, "srisrisri");
+//	sendall(sock,strdup(colLine),strlen(colLine),0);
 
 	// loop through each row and send to socket 
 	while(row!=NULL){
@@ -678,7 +678,7 @@ void* sendFile(void* param){
 
 	}
 	// send eof signal
-	sleep(10);
+	sleep(15);
 	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
 	fclose(fp);

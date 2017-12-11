@@ -152,14 +152,14 @@ void * sort(void *arg){
 	}*/
 
 	//printf("%i\n", column);
-	if(((Number = recv(*mysock,colNum,sizeof(colNum),0)))<0)
-		perror("reading stream message error");
-	else{
-		row = strdup(buff);//should be column number
-	}
+	//	if(((Number = recv(*mysock,colNum,sizeof(colNum),0)))<0)
+	//		perror("reading stream message error");
+	//	else{
+	//		row = strdup(buff);//should be column number
+	//	}
 	//printf("after row\n");
-	printf("%i\n", atoi(colNum));
-	int col = atoi(colNum);
+	//	printf("%i\n", atoi(colNum));
+	//	int col = atoi(colNum);
 
 
 	int isNumeric = 1;
@@ -248,14 +248,14 @@ void * sort(void *arg){
 
 void dump(int * sock, int colNum){
 
-	printf("%s", globArr[0]);
+	//printf("%s", globArr[0]);
 
 
 	int ctr;
 	Node* head = NULL;
 
 	pthread_mutex_lock(&lock);
-	for(ctr=1;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
+	for(ctr=0;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
 		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
 
@@ -328,16 +328,8 @@ void dump(int * sock, int colNum){
 
 	pthread_mutex_unlock(&lock);
 
-
-
-
-
-
-
-
-
-
 }
+
 
 int main(int argc, char* argv[]){
 	threadNode *global = malloc(sizeof(threadNode));
