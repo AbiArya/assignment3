@@ -20,7 +20,7 @@
 //#include "sorter_thread.h"
 #include "client.h"
 int maxnum=0;
-
+//									MAKE SURE TO JOIN ALL THREADS BEFORE YOU DUMP
 void dump(int*, int);
 
 void insertArr(char* str){
@@ -67,7 +67,7 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 		strcpy(remainder,buffer);
 
 	}
-	
+
 	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
 		print = malloc(sizeof(char)*(stuff-remainder) +1);
 		strncpy(print,remainder,(stuff-remainder));
@@ -84,6 +84,54 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 	return remainder;
 }
 
+
+int recvallcommand(int socket, char *buffer, size_t length, int flags){
+	int  n =0;
+	char *p = buffer;
+	char * remainder;
+	while (n!=1)
+	{
+		n = recv(socket, p, length, flags);
+		if (n == 1)
+			break;
+		else if(n<0)
+			return "ERROR";
+		p += n;
+		length -= n;
+	}
+	buffer[strlen(buffer)]='\0';
+
+	/* char *stuff = buffer;
+	   char * print;
+	   if(strlen(rval)!=0){
+	   remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
+	   strcat(remainder, rval);
+	   strcat(remainder,buffer);
+	   }else{
+	   remainder=malloc(strlen(buffer));
+	   strcpy(remainder,buffer);
+
+	   }
+
+	   while((stuff=strstr(remainder,"srisrisri"))!=NULL){
+	   print = malloc(sizeof(char)*(stuff-remainder) +1);
+	   strncpy(print,remainder,(stuff-remainder));
+	   print[strlen(print)]='\0';
+
+	   pthread_mutex_lock(&lock);
+	//insertArr(strdup(print));
+	pthread_mutex_unlock(&lock);
+	//free(print); //causes weird printing error
+	remainder = remainder + (stuff-remainder)+9;
+	}
+	*/       
+
+	if(strcmp(buffer,"d")==0)
+		return 1;
+	else
+		return 0;
+
+}
 
 void * sort(void *arg){
 	int * mysock = (int*)arg;
@@ -118,7 +166,7 @@ void * sort(void *arg){
 	int id = 0;
 
 
-	
+
 	char* cellWithSpaces = getCellAtInd(row,column);
 	id++;
 
@@ -169,7 +217,7 @@ void * sort(void *arg){
 				row = buff;
 				if(row==NULL) break;
 
-			
+
 
 				//	insertArr(strdup(row));
 			}
@@ -190,7 +238,7 @@ void * sort(void *arg){
 
 
 
-***need to generate output file name to write to****
+ ***need to generate output file name to write to****
 
 
 
@@ -199,7 +247,7 @@ void * sort(void *arg){
 
 
 void dump(int * sock, int colNum){
-	
+
 	printf("%s", globArr[0]);
 
 
@@ -283,7 +331,7 @@ void dump(int * sock, int colNum){
 
 
 
-	
+
 
 
 
@@ -334,22 +382,26 @@ int main(int argc, char* argv[]){
 			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof(ipstr));
 			//	printf("%s\n", ipstr);//ip address of the connection, store or print this, whatever
 			memset(buff,0,sizeof(buff));
-			/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
+			if((rval = recvallcommand(*mysock,buff,1,0))<0)
 				perror("reading stream message error");
-				else if(strcmp(buff,"dumpthatshit\n")){
-			//call dump
-			continue;
-
-			}*/
-			pthread_t newthread;
-			if(ptr->curr == NULL){
-				//	pthread_t newthread;
-				ptr->curr = &newthread;
-				ptr->next = malloc(sizeof(threadNode));
-				ptr = ptr->next;
+			else if(rval==1){
+				//MAKE SURE TO JOIN
+				//call dump
+				continue;
 			}
-			pthread_create(&newthread, NULL, sort, (void*)mysock);			
-			//		sort((void*) mysock);
+			else{
+
+
+				pthread_t newthread;
+				if(ptr->curr == NULL){
+					//	pthread_t newthread;
+					ptr->curr = &newthread;
+					ptr->next = malloc(sizeof(threadNode));
+					ptr = ptr->next;
+				}
+				pthread_create(&newthread, NULL, sort, (void*)mysock);			
+				//		sort((void*) mysock);
+			}
 		}	
 	}while(1);	
 
