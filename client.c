@@ -368,6 +368,9 @@ int main(int argc, char* argv[]){
 			outputDir=argv[i+1];
 			toOut=1;
 		}
+		else if(strcmp(argv[i],"-d")==0){
+			dirName=argv[i+1];
+		}
 		i=i+1;
 	}    
 
@@ -378,7 +381,7 @@ int main(int argc, char* argv[]){
 	}
 	closedir(tmpb);
 
-    if(argc == 7){
+    if(argc >= 7){
         colName = argv[2];
         hostname = argv[4];
         portno = atoi(argv[6]);
@@ -396,6 +399,7 @@ int main(int argc, char* argv[]){
     struct trav_param* param = (struct trav_param*)malloc(sizeof(struct trav_param));
     param->rootDirName = dirName;
     param->colName = colName;
+    printf("\n\ncolname: %s\n\n", colName);
     traverse(param);
     free(param);
 	struct sockaddr_in server;
@@ -480,7 +484,7 @@ void* traverse(void* param){
 
 
 	pthread_t* threads = malloc(sizeof(pthread_t)*10);
-    int tct=0;
+        int tct=0;
 	int tsize = 10;
 
 	struct trav_param* trav = (struct trav_param*) param;
