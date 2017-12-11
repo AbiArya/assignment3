@@ -73,8 +73,9 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 		strncpy(print,remainder,(stuff-remainder));
 		print[strlen(print)]='\0';
 
-		
+		pthread_mutex_lock(&lock);
 		insertArr(strdup(print));
+		pthread_mutex_unlock(&lock);
 		//free(print); //causes weird printing error
 		remainder = remainder + (stuff-remainder)+9;
 	}
