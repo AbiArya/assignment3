@@ -17,23 +17,23 @@
 #include <sys/stat.h>
 #include <pthread.h>
 
-int threadCount = 1;
-int initialTID = -1;
+//int threadCount = 1;
+//int initialTID = -1;
 pthread_mutex_t lock;
-int colNum = -2;
-char* title = NULL;
+//int colNum = -2;
+//char* title = NULL;
 
 
-struct trav_param{
+/*struct trav_param{
 	char* rootDirName;
 	char* colName;
-};
+};*/
 
-struct sort_param{
+/*struct sort_param{
 	FILE* fp;
 	char* colName;
 
-};
+};*/
 
 //prototypes
 char* getRow(FILE*);
@@ -45,7 +45,7 @@ int sendall(int, const void*, size_t, int);
 
 // methods
 
-char* isDir(char* rootDirName, char* filename){
+/*char* isDir(char* rootDirName, char* filename){
 	
 
 	char* path = malloc(strlen(rootDirName) + 1 + strlen(filename) + 20);
@@ -76,9 +76,9 @@ char* isDir(char* rootDirName, char* filename){
 	return NULL;
 	
 
-}
+}*/
 
-pthread_t* moreThreads(pthread_t* lines, int size){
+/*pthread_t* moreThreads(pthread_t* lines, int size){
     int newSize = size * 1.5;
     pthread_t* temp = NULL;
 
@@ -88,9 +88,9 @@ pthread_t* moreThreads(pthread_t* lines, int size){
     }
 
     return lines;
-}
+}*/
 
-char* getRow(FILE* fp){ // add file pointer as param, the alloced row must be freed somewhere
+/*char* getRow(FILE* fp){ // add file pointer as param, the alloced row must be freed somewhere
 
     char* line = calloc(512, sizeof(char));
     line[0] = 0;
@@ -141,7 +141,7 @@ int getColNum(char* row1, char* colName){
         colCount++;
     }
     return -1;
-}
+}*/
 
 
 
