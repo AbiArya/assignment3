@@ -19,8 +19,15 @@
 #include <pthread.h>
 //#include "sorter_thread.h"
 #include "client.h"
-int maxnum=0;
+
 //									MAKE SURE TO JOIN ALL THREADS BEFORE YOU DUMP
+
+
+
+/* COLUMN Num IS STILL HARDCODED */
+
+
+
 void dump(int*, int);
 
 void insertArr(char* str){
@@ -76,11 +83,11 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 	char *stuff = buffer;
 	char * print;
 	if(strlen(rval)!=0){
-		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
+		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)) + 5     );
 		strcat(remainder, rval);
 		strcat(remainder,buffer);
 	}else{
-		remainder=malloc(strlen(buffer));
+		remainder=malloc(strlen(buffer)+5);
 		strcpy(remainder,buffer);
 
 	}
@@ -91,7 +98,7 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 		print[strlen(print)]='\0';
 
 		pthread_mutex_lock(&lock);
-		insertArr(strdup(print));
+		insertArr(print);
 		pthread_mutex_unlock(&lock);
 		//free(print); //causes weird printing error
 		remainder = remainder + (stuff-remainder)+9;
@@ -104,7 +111,6 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 int recvallcommand(int socket, char *buffer, size_t length, int flags){
 	int  n =0;
 	char *p = buffer;
-	char * remainder;
 	while (n!=1)
 	{
 		n = recv(socket, p, length, flags);
@@ -327,7 +333,6 @@ int main(int argc, char* argv[]){
 	threadNode* head = NULL;
 	//variables
 	int sock;//return value of socket function
-	int counter=0;
 	struct sockaddr_in server, cli_addr;
 	//int mysock;
 	char buff[1024];
@@ -406,23 +411,8 @@ int main(int argc, char* argv[]){
 				}
 
 				pthread_create(&newthread, NULL, sort, (void*)mysock);
-				counter++;
 			}
-			//sleep(30);
-
-			/*	if(counter==2){
-
-				threadNode* tmp = head;
-				while(tmp!=NULL){
-
-				pthread_join(*(tmp->curr), NULL);
-				tmp = tmp->next;					
-
-
-				}
-				dump(&sock,1);
-
-				}*/
+			
 		}	
 	}while(1);	
 

@@ -345,6 +345,41 @@ void insertArr(char* str){
 
 
 }
+/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
+
 
 int main(int argc, char* argv[]){
 	globArr = (char**)malloc(sizeof(char*) * 5000);
@@ -441,7 +476,7 @@ int main(int argc, char* argv[]){
 	printf("\n %s \n",finalName);
 //	pthread_exit(0);
 	FILE* h = fopen(finalName, "w+");
-	char* rval="";
+	//char* rval="";
 	char buff[10001];
 	char leftover[10001];
 	memset(leftover,0,sizeof(leftover));
@@ -639,7 +674,7 @@ void* sendFile(void* param){
 	// create a socket
 	int sock; //the output of method socket()
 	struct sockaddr_in server;// socket struct
-	char buff[1024];//used for the input
+	//char buff[1024];//used for the input
 	struct hostent *hp; //used for getting hostname
 
 
