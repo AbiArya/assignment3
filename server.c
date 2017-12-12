@@ -312,7 +312,7 @@ void dump(int * sock, int colNum){
 		ptr=ptr->next;
 		free(prev);
 	}
-	printf("donezo"); 
+//	printf("donezo"); 
 	sleep(10);
 	sendall(*sock,"borisonufriyev", strlen("borisonufriyev"),0);
 	pthread_mutex_unlock(&lock);
