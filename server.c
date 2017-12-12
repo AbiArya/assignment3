@@ -395,14 +395,13 @@ int main(int argc, char* argv[]){
 					
 					ptr->next = malloc(sizeof(threadNode));
 					ptr = ptr->next;
-					ptr=NULL
 				}
 				pthread_create(&newthread, NULL, sort, (void*)mysock);			
 				//		sort((void*) mysock);
 				counter++;
 			}
 			//sleep(30);
-		if(counter==5){
+		if(counter==1){
 			sleep(20);
 			dump(3,1);
 		}
