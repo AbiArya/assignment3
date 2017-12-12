@@ -41,6 +41,23 @@ void insertArr(char* str){
 }
 
 
+int sendall(int socket, const void *buffer, size_t length, int flags){
+        ssize_t n;
+        const char *p = buffer;
+        while (length > 0)
+        {
+                n = send(socket, p, length, flags);
+                if (n <= 0)
+                        return -1;
+                p += n;
+                length -= n;
+        }
+       //send(socket,"srisrisri", strlen("srisrisri"),0);
+                return 0;
+                }
+
+
+
 char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 	ssize_t n;
 	char *p = buffer;
@@ -79,7 +96,6 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 		//free(print); //causes weird printing error
 		remainder = remainder + (stuff-remainder)+9;
 	}
-
 
 	return remainder;
 }
@@ -150,7 +166,7 @@ void * sort(void *arg){
 
 	int isFloat=0;
 
-	pthread_mutex_lock(&lock);
+//	pthread_mutex_lock(&lock);
 	if(type == -1){
 
 		while(i < strlen(cellWithSpaces)){
@@ -167,13 +183,13 @@ void * sort(void *arg){
 			i++;
 
 		}
-		        //pthread_mutex_lock(&lock);
+		pthread_mutex_lock(&lock);
 		if(isFloat) type = 1;
 		else if(isNumeric) type = 0;
 		else type = 2;
-			//pthread_mutex_unlock(&lock);
+		pthread_mutex_unlock(&lock);
 	}
-	pthread_mutex_unlock(&lock);
+//	pthread_mutex_unlock(&lock);
 	memset(leftover,0,sizeof(leftover));
 
 	while(loop==0){
@@ -184,7 +200,7 @@ void * sort(void *arg){
 			perror("reading stream message error");
 
 		else{
-			if(strstr(buff,"borisonufriyev")!=NULL)
+			if(strcmp(buff,"borisonufriyev")==0)
 				break;
 			if(id!=0){
 				//memset(leftover, 0, sizeof(leftover));
@@ -287,23 +303,25 @@ void dump(int * sock, int colNum){
 	Node* ptr = head;
 	Node* prev = NULL;
 
-
+	
 	while(ptr!=NULL){
-		printf("%s", globArr[ptr->id]);
+	//	printf("%s", globArr[ptr->id]);
+		sendall(*sock,globArr[ptr->id],strlen(globArr[ptr->id]),0);
 		free(globArr[ptr->id]);
 		prev = ptr;
 		ptr=ptr->next;
 		free(prev);
-	} 
-
-
+	}
+	printf("donezo"); 
+	sleep(10);
+	sendall(*sock,"borisonufriyev", strlen("borisonufriyev"),0);
 	pthread_mutex_unlock(&lock);
-
+	close(*sock);
 }
 
 
 int main(int argc, char* argv[]){
-	
+
 
 
 	threadNode* head = NULL;
@@ -353,15 +371,26 @@ int main(int argc, char* argv[]){
 			else if(rval==1){
 				//MAKE SURE TO JOIN
 				//call dump
-				continue;
-			}
-			else{
+
+				threadNode* tmp = head;
+				while(tmp!=NULL){
+
+					pthread_join(*(tmp->curr), NULL);
+					tmp = tmp->next;
+
+
+				}
+				dump(mysock,1); //CHANGE THE 1 TO THE COLNUM
+
+
+
+			}else{
 
 
 				pthread_t newthread;
-			
 
-					if(head == NULL){
+
+				if(head == NULL){
 
 					head = malloc(sizeof(threadNode));
 					head->curr = &newthread;
@@ -381,19 +410,19 @@ int main(int argc, char* argv[]){
 			}
 			//sleep(30);
 
-		if(counter==2){
-			
-			threadNode* tmp = head;
-			while(tmp!=NULL){
+			/*	if(counter==2){
+
+				threadNode* tmp = head;
+				while(tmp!=NULL){
 
 				pthread_join(*(tmp->curr), NULL);
 				tmp = tmp->next;					
-				
 
-			}
-			dump(&sock,1);
 
-		}
+				}
+				dump(&sock,1);
+
+				}*/
 		}	
 	}while(1);	
 

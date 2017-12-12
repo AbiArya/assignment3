@@ -105,6 +105,49 @@ pthread_t* moreThreads(pthread_t* lines, int size){
 }
 
 
+char* recvall(int socket, char *buffer, size_t length, int flags,char *rval,FILE* f){
+	ssize_t n;
+	char *p = buffer;
+	char * remainder;
+	while (strstr(buffer,"srisrisri")==NULL)
+	{
+		n = recv(socket, p, length, flags);
+		if (n == 0)
+			break;
+		else if(n<0)
+			return "ERROR";
+		p += n;
+		length -= n;
+	}
+	buffer[strlen(buffer)]='\0';
+	char *stuff = buffer;
+	char * print;
+	if(strlen(rval)!=0){
+		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
+		strcat(remainder, rval);
+		strcat(remainder,buffer);
+	}else{
+		remainder=malloc(strlen(buffer));
+		strcpy(remainder,buffer);
+
+	}
+
+	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
+		print = malloc(sizeof(char)*(stuff-remainder) +1);
+		strncpy(print,remainder,(stuff-remainder));
+		print[strlen(print)]='\0';
+
+//		pthread_mutex_lock(&lock);
+//		insertArr(strdup(print));
+//		pthread_mutex_unlock(&lock);
+		fprintf(f,"%s",print);
+	
+		//free(print); //causes weird printing error
+		remainder = remainder + (stuff-remainder)+9;
+	}
+
+	return remainder;
+}
 
 char* trim(char* str){
 	char* ans;
@@ -303,52 +346,9 @@ void insertArr(char* str){
 
 }
 
-char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
-	ssize_t n;
-	char *p = buffer;
-	char * remainder;
-	while (strstr(buffer,"srisrisri")==NULL)
-	{
-		n = recv(socket, p, length, flags);
-		if (n == 0)
-			break;
-		else if(n<0)
-			return "ERROR";
-		p += n;
-		length -= n;
-	}
-	buffer[strlen(buffer)]='\0';
-	char *stuff = buffer;
-	char * print;
-	if(strlen(rval)!=0){
-		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
-		strcat(remainder, rval);
-		strcat(remainder,buffer);
-	}else{
-		remainder=malloc(strlen(buffer));
-		strcpy(remainder,buffer);
-
-	}
-
-	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
-		print = malloc(sizeof(char)*(stuff-remainder) +1);
-		strncpy(print,remainder,(stuff-remainder));
-		print[strlen(print)]='\0';
-
-
-		insertArr(strdup(print));
-		//free(print); //causes weird printing error
-		remainder = remainder + (stuff-remainder)+9;
-	}
-
-
-	return remainder;
-}
-
-
 int main(int argc, char* argv[]){
 	globArr = (char**)malloc(sizeof(char*) * 5000);
-
+	initialTID = syscall(__NR_gettid);
 	char* dirName = NULL;
 	char* colName = NULL;
 	char* outputDir = "./\0"; // This is the directory where the file should be outputted
@@ -405,7 +405,7 @@ int main(int argc, char* argv[]){
 	struct sockaddr_in server;
 	struct hostent *hp; 
 
-	int* sock;
+	int sock;
 	sock = socket(AF_INET, SOCK_STREAM,0);
 
 	if(socket<0){
@@ -427,42 +427,54 @@ int main(int argc, char* argv[]){
 		perror("Connection failed");
 		exit(1);
 	}
-	char * finalName = malloc(sizeof(outputDir) + sizeof(colName) + 24);
+	char * finalName = malloc(strlen(outputDir) + strlen(colName) + 24);
+	strcpy(finalName, outputDir);
 	if(toOut==1){
 		if(outputDir[strlen(outputDir)-1]!='/')
-			strcat(outputDir,"/"); 	
-		strcpy(finalName, outputDir);
+			strcat(finalName,"/"); 	
+		//	strcpy(finalName, outputDir);
 	}
 	strcat(finalName, "AllFiles-sorted-");
 	strcat(finalName, colName);
 	strcat(finalName,".csv");
-
+	finalName[strlen(finalName)]='\0';
+	printf("\n %s \n",finalName);
+//	pthread_exit(0);
 	FILE* h = fopen(finalName, "w+");
-
-	char * rval = "";
+	char* rval="";
 	char buff[10001];
-	char leftover[100001];
+	char leftover[10001];
 	memset(leftover,0,sizeof(leftover));
-	sendall(*sock,"dump that shit", strlen("dump that shit"),0);
+	memset(buff,0,sizeof(buff));
+	sendall(sock,"d", strlen("d"),0);
+//	pthread_exit(0);//EXITS RIGHT AFTER DUMP REQUEST SENT, FOR TESTING PURPOSES
+	int output=99;
+	while(output>0){
 
-	while(1){
 
-
-		memset(buff,0,sizeof(buff));
-		if(strcmp((rval = recvall(*sock,buff,10000,0,leftover)),"ERROR")==0)
-			perror("reading stream message error");
-
+		/*if(strcmp((rval = recvall(sock,buff,10000,0,leftover,h)),"ERROR")==0)
+			perror("error receiving stuff");
 		else{
-			if(strstr(buff,"borisonufriyev")!=NULL){
+			if(strcmp(buff,"borisonufriyev")==0){
 				break;
 			}
+			if(strlen(rval)>0)
+				strcpy(leftover,rval);
+			//rval=strdup(leftover);
+			if(buff==NULL)
+				break;
+			//fprintf(h,"%s",buff);
+			memset(buff,0,sizeof(buff));		
+		}*/
+		if((output = recv(sock,buff,sizeof(buff),0))<0)
+			perror("error ");
+		else{
+			if(strcmp(buff,"borisonufriyev")==0)
+				break;
+			fprintf(h,"%s", buff);
+			memset(buff,0,sizeof(buff));	
 
-			strcpy(leftover,rval);
-			//row = buff;
-			//if(row==NULL) break;
-			fprintf(h, "%s\n", rval);
-
-		}   
+			}
 	}
 
 
@@ -662,8 +674,8 @@ void* sendFile(void* param){
 	// send col num
 	colLine[0] = num;
 	sendall(sock,"s", strlen("s"),0);
-//	strcat(colLine, "srisrisri");
-//	sendall(sock,strdup(colLine),strlen(colLine),0);
+	//	strcat(colLine, "srisrisri");
+	//	sendall(sock,strdup(colLine),strlen(colLine),0);
 
 	// loop through each row and send to socket 
 	while(row!=NULL){
@@ -704,3 +716,5 @@ int sendall(int socket, const void *buffer, size_t length, int flags){
 	//send(socket,"srisrisri", strlen("srisrisri"),0);
 	return 0;
 }
+
+
