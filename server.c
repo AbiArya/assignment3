@@ -95,36 +95,11 @@ int recvallcommand(int socket, char *buffer, size_t length, int flags){
 		if (n == 1)
 			break;
 		else if(n<0)
-			return "ERROR";
+			return -1;
 		p += n;
 		length -= n;
 	}
 	buffer[strlen(buffer)]='\0';
-
-	/* char *stuff = buffer;
-	   char * print;
-	   if(strlen(rval)!=0){
-	   remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)));
-	   strcat(remainder, rval);
-	   strcat(remainder,buffer);
-	   }else{
-	   remainder=malloc(strlen(buffer));
-	   strcpy(remainder,buffer);
-
-	   }
-
-	   while((stuff=strstr(remainder,"srisrisri"))!=NULL){
-	   print = malloc(sizeof(char)*(stuff-remainder) +1);
-	   strncpy(print,remainder,(stuff-remainder));
-	   print[strlen(print)]='\0';
-
-	   pthread_mutex_lock(&lock);
-	//insertArr(strdup(print));
-	pthread_mutex_unlock(&lock);
-	//free(print); //causes weird printing error
-	remainder = remainder + (stuff-remainder)+9;
-	}
-	*/       
 
 	if(strcmp(buffer,"d")==0)
 		return 1;
@@ -175,7 +150,7 @@ void * sort(void *arg){
 
 	int isFloat=0;
 
-	//pthread_mutex_lock(&lock);
+	pthread_mutex_lock(&lock);
 	if(type == -1){
 
 		while(i < strlen(cellWithSpaces)){
@@ -192,13 +167,13 @@ void * sort(void *arg){
 			i++;
 
 		}
-		        pthread_mutex_lock(&lock);
+		        //pthread_mutex_lock(&lock);
 		if(isFloat) type = 1;
 		else if(isNumeric) type = 0;
 		else type = 2;
-			pthread_mutex_unlock(&lock);
+			//pthread_mutex_unlock(&lock);
 	}
-	//pthread_mutex_unlock(&lock);
+	pthread_mutex_unlock(&lock);
 	memset(leftover,0,sizeof(leftover));
 
 	while(loop==0){
@@ -217,9 +192,6 @@ void * sort(void *arg){
 				row = buff;
 				if(row==NULL) break;
 
-
-
-				//	insertArr(strdup(row));
 			}
 
 
@@ -227,7 +199,6 @@ void * sort(void *arg){
 		}   
 	}
 
-	printf("%i\n", maxnum);	
 	//dump(mysock, 1); //just testing on director_name
 	close(*mysock);
 	pthread_exit(0);
@@ -260,7 +231,7 @@ void dump(int * sock, int colNum){
 		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
 
 		if(strcmp(cellWithSpaces, "Error") == 0){
-			printf("Error has occurredalskdjlaksdjad;lskj\n");
+			printf("Error has occurred\n");
 			pthread_exit(NULL);
 		}
 		char* cell = trim(cellWithSpaces);
@@ -332,10 +303,10 @@ void dump(int * sock, int colNum){
 
 
 int main(int argc, char* argv[]){
-	threadNode *global = malloc(sizeof(threadNode));
-	global->curr = NULL;
-	global->next = NULL;
-	threadNode *ptr = global;
+	
+
+
+	threadNode* head = NULL;
 	//variables
 	int sock;//return value of socket function
 	int counter=0;
@@ -382,28 +353,46 @@ int main(int argc, char* argv[]){
 			else if(rval==1){
 				//MAKE SURE TO JOIN
 				//call dump
-				
 				continue;
 			}
 			else{
 
 
 				pthread_t newthread;
-				if(ptr->curr == NULL){
-					//	pthread_t newthread;
-					ptr->curr = &newthread;
-					
-					ptr->next = malloc(sizeof(threadNode));
-					ptr = ptr->next;
+			
+
+					if(head == NULL){
+
+					head = malloc(sizeof(threadNode));
+					head->curr = &newthread;
+					head->next = NULL;
 				}
-				pthread_create(&newthread, NULL, sort, (void*)mysock);			
-				//		sort((void*) mysock);
+				else{
+					threadNode* ins = malloc(sizeof(threadNode));
+					ins->curr = &newthread;
+					ins->next = head;
+					head = ins;
+
+
+				}
+
+				pthread_create(&newthread, NULL, sort, (void*)mysock);
 				counter++;
 			}
 			//sleep(30);
-		if(counter==1){
-			sleep(20);
-			dump(3,1);
+
+		if(counter==2){
+			
+			threadNode* tmp = head;
+			while(tmp!=NULL){
+
+				pthread_join(*(tmp->curr), NULL);
+				tmp = tmp->next;					
+				
+
+			}
+			dump(&sock,1);
+
 		}
 		}	
 	}while(1);	
