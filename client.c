@@ -474,10 +474,7 @@ int main(int argc, char* argv[]){
 	strcat(finalName,".csv");
 	finalName[strlen(finalName)]='\0';
 	char num[4];
-//	snprintf(num,2,"%d",colNum);
-//	printf("%i\n", colNum);
 	sprintf(num,"%i", colNum);
-//	printf("%s\n", num);
 	FILE* h = fopen(finalName, "w+");
 	//char* rval="";
 	char buff[10001];
@@ -487,12 +484,7 @@ int main(int argc, char* argv[]){
 	sendall(sock,"d", strlen("d"),0);
 	sleep(5);
 	sendall(sock, num, strlen(num), 0);
-	if((colNum/10)>0)
-		sendall(sock,"0", 1, 0);
-	else
-		sendall(sock, "1", 1,0);
 	sleep(5);
-	sendall(sock, num, strlen(num),0);
 	//pthread_exit(0);//EXITS RIGHT AFTER DUMP REQUEST SENT, FOR TESTING PURPOSES
 	fprintf(h,"%s\n", "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes");
 	int output=99;

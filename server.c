@@ -360,6 +360,7 @@ int main(int argc, char* argv[]){
 	//listen
 	listen(sock, 5);
 	int clilen = sizeof(cli_addr);
+	printf("Received connections from: ");
 	//accept
 	do{
 		int *mysock = malloc(sizeof(int));
@@ -370,7 +371,7 @@ int main(int argc, char* argv[]){
 			struct sockaddr_in *s = &cli_addr;
 			char ipstr[INET6_ADDRSTRLEN];
 			inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof(ipstr));
-			//	printf("%s\n", ipstr);//ip address of the connection, store or print this, whatever
+				printf("%s,", ipstr);//ip address of the connection, store or print this, whatever
 			memset(buff,0,sizeof(buff));
 			if((rval = recvallcommand(*mysock,buff,1,0))<0)
 				perror("reading stream message error");
