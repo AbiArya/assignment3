@@ -257,7 +257,7 @@ void dump(int * sock, int colNum){
 		head = insertAtHead(ins, head);
 	}
 
-	printf("\n\n\ntype=%d\ncolnum=%d\n\n\n", type, colNum);
+	//printf("\n\n\ntype=%d\ncolnum=%d\n\n\n", type, colNum);
 	if(type==1){
 		head = mergeSort(head, 1);
 	}
