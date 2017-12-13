@@ -23,10 +23,6 @@
 
 
 
-/* COLUMN Num IS STILL HARDCODED */
-
-
-
 void dump(int*, int);
 
 void insertArr(char* str){
@@ -261,7 +257,7 @@ void dump(int * sock, int colNum){
 		head = insertAtHead(ins, head);
 	}
 
-
+	printf("\n\n\ntype=%d\ncolnum=%d\n\n\n", type, colNum);
 	if(type==1){
 		head = mergeSort(head, 1);
 	}
@@ -347,6 +343,7 @@ int main(int argc, char* argv[]){
 				//MAKE SURE TO JOIN
 				//call dump
 				char number [4];
+				memset(number,0,sizeof(number));
 				recv(*mysock, number, 2, 0);
 				number[strlen(number)]='\0';
 				fflush(stdout);				
