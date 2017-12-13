@@ -11,7 +11,7 @@ int numElems = 5000;
 int initialTID = -1;
 int finalSort = 0;
 char* title = NULL;
-int colNum = -2;
+
 
 
 struct temp{

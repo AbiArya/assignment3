@@ -348,18 +348,6 @@ int main(int argc, char* argv[]){
 				//call dump
 				char number [4];
 				recv(*mysock, number, 2, 0);
-
-			/*	if((rval = recv(*mysock, number, 1, 0))<0)
-					perror("reading stream message error");
-				if(strcmp(number, "1")==0){
-					memset(number, 0, sizeof(number));
-					recv(*mysock, number, 2,0);
-				}else{
-					memset(number, 0, sizeof(number));
-					recv(*mysock, number, 1,0);
-				}*/
-
-
 				number[strlen(number)]='\0';
 				fflush(stdout);				
 				threadNode* tmp = head;
