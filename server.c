@@ -189,6 +189,13 @@ void dump(int * sock, int colNum){
 	Node* head = NULL;
 
 	pthread_mutex_lock(&lock);
+
+	if(globArrEnd == 0){
+		printf("\nNo info on server to dump\n");
+		close(*sock);
+		return;
+
+	}
 	for(ctr=0;ctr<globArrEnd;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
 
