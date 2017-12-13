@@ -285,12 +285,12 @@ void dump(int * sock, int colNum){
 	
 	while(ptr!=NULL){
 		sendall(*sock,globArr[ptr->id],strlen(globArr[ptr->id]),0);
-		free(globArr[ptr->id]);
+		//free(globArr[ptr->id]);
 		prev = ptr;
 		ptr=ptr->next;
 		free(prev);
 	}
-	globArrEnd = 0;
+	//globArrEnd = 0;
 	sleep(10);
 	sendall(*sock,"borisonufriyev", strlen("borisonufriyev"),0);
 	pthread_mutex_unlock(&lock);
