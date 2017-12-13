@@ -434,7 +434,7 @@ int main(int argc, char* argv[]){
 	struct trav_param* param = (struct trav_param*)malloc(sizeof(struct trav_param));
 	param->rootDirName = dirName;
 	param->colName = colName;
-	printf("\n\ncolname: %s\n\n", colName);
+	//printf("\n\ncolname: %s\n\n", colName);
 	traverse(param);
 	free(param);
 	struct sockaddr_in server;
@@ -473,8 +473,11 @@ int main(int argc, char* argv[]){
 	strcat(finalName, colName);
 	strcat(finalName,".csv");
 	finalName[strlen(finalName)]='\0';
-	printf("\n %s \n",finalName);
-//	pthread_exit(0);
+	char num[4];
+//	snprintf(num,2,"%d",colNum);
+//	printf("%i\n", colNum);
+	sprintf(num,"%i", colNum);
+//	printf("%s\n", num);
 	FILE* h = fopen(finalName, "w+");
 	//char* rval="";
 	char buff[10001];
@@ -482,6 +485,14 @@ int main(int argc, char* argv[]){
 	memset(leftover,0,sizeof(leftover));
 	memset(buff,0,sizeof(buff));
 	sendall(sock,"d", strlen("d"),0);
+	sleep(5);
+	sendall(sock, num, strlen(num), 0);
+	if((colNum/10)>0)
+		sendall(sock,"0", 1, 0);
+	else
+		sendall(sock, "1", 1,0);
+	sleep(5);
+	sendall(sock, num, strlen(num),0);
 	//pthread_exit(0);//EXITS RIGHT AFTER DUMP REQUEST SENT, FOR TESTING PURPOSES
 	fprintf(h,"%s\n", "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes");
 	int output=99;
@@ -663,6 +674,7 @@ void* sendFile(void* param){
 	pthread_mutex_lock(&lock);
 	if(colNum == -2){
 		colNum = getColNum(titleRow, colName);
+		//printf("%i column number\n", colNum);
 	}
 	if(colNum == -1){
 		printf("Error has occured.\n");
@@ -730,7 +742,7 @@ void* sendFile(void* param){
 	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
 	fclose(fp);
-	printf("sent message");
+//	printf("sent message");
 	close(sock);
 
 
