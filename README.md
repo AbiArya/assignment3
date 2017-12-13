@@ -79,7 +79,7 @@ Solution: wrote sendall() and recvall() functions to make sure entire rows are s
 
 * Certain rows in the given CSV have movie titles or other columns with lots of trailing spaces. These are printed as is --- we trim them when sorting, but when outputting, the spaces are still there. We are assuming this is fine.
 
-* ***Server frees its allocated memory after each dump request.***
+* ***Server does not free its allocated memory after each dump request.***
 
 
 
