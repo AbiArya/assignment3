@@ -53,7 +53,7 @@ This is the general flow of logic in the sorter:
 Solution: Create one mergesort which then calls seperate mergesorts for each type. 
  
 * Problem: Determining a protocol for dump requests
-Solution: once a directory is completely traversed, automatically dump. After one client dumps, it frees all that allocated memory. If two clients run at once then, the second client's dump request will do nothing as the first dump will have already printed all info. 
+Solution: once a directory is completely traversed, automatically dump. After one client dumps, it does not free all that allocated memory. If one client is run after another, the second dump request will also return the content from the first dump. If two clients run concurrently, then both dumps will include content from both clients.
 
 * Problem: Client doesn't send all bytes at once
 Solution: wrote sendall() and recvall() functions to make sure entire rows are sent
