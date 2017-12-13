@@ -1,5 +1,20 @@
 # sorterPart3
 
+
+Group Members:
+
+Srihari Venkatesan - sv443
+
+Boris Onufriyev - beo19
+
+Abhishek Arya - aa1488
+
+Ryan Lee - rl630
+
+
+
+
+
 ## Project Logic
 This is the general flow of logic in the sorter:
 
