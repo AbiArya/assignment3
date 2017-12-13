@@ -141,40 +141,6 @@ void * sort(void *arg){
 	
 	int id = 1;
 
-
-
-	/*char* cellWithSpaces = getCellAtInd(row,column);
-	id++;
-
-	//discern data type of sorting column
-	int i=0;
-
-	int isFloat=0;
-
-//	pthread_mutex_lock(&lock);
-	if(type == -1){
-
-		while(i < strlen(cellWithSpaces)){
-
-			if(!isdigit(cellWithSpaces[i])){
-				if(cellWithSpaces[i] == '.'){
-					isFloat = 1;
-					i++;
-					continue;
-				}
-				isNumeric = 0;
-				break;
-			} 
-			i++;
-
-		}
-		pthread_mutex_lock(&lock);
-		if(isFloat) type = 1;
-		else if(isNumeric) type = 0;
-		else type = 2;
-		pthread_mutex_unlock(&lock);
-	}*/
-//	pthread_mutex_unlock(&lock);
 	memset(leftover,0,sizeof(leftover));
 
 	while(loop==0){
@@ -200,7 +166,6 @@ void * sort(void *arg){
 		}   
 	}
 
-	//dump(mysock, 1); //just testing on director_name
 	close(*mysock);
 	pthread_exit(0);
 }
@@ -228,7 +193,7 @@ void dump(int * sock, int colNum){
 	Node* head = NULL;
 
 	pthread_mutex_lock(&lock);
-	for(ctr=0;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
+	for(ctr=0;ctr<globArrEnd;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
 
 		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
@@ -316,14 +281,13 @@ void dump(int * sock, int colNum){
 
 	
 	while(ptr!=NULL){
-	//	printf("%s", globArr[ptr->id]);
 		sendall(*sock,globArr[ptr->id],strlen(globArr[ptr->id]),0);
 		free(globArr[ptr->id]);
 		prev = ptr;
 		ptr=ptr->next;
 		free(prev);
 	}
-//	printf("donezo"); 
+	globArrEnd = 0;
 	sleep(10);
 	sendall(*sock,"borisonufriyev", strlen("borisonufriyev"),0);
 	pthread_mutex_unlock(&lock);

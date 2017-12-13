@@ -19,13 +19,9 @@
 int threadCount = 1;
 char* outputfile = NULL;
 pthread_mutex_t lock;
-char** globArr = NULL;
-int globArrEnd = 0;
 int numElems = 5000;
 int initialTID = -1;
 int finalSort = 0;
-int type = -1; //0=int, 1=float, 2=string
-char* title = NULL;
 int colNum = -2;
 int portno;
 
@@ -59,24 +55,12 @@ struct sort_param{
 
 
 //prototypes
-Node* insertAtHead(Node*, Node*);
+
 char* getRow(FILE*);
 int getColNum(char*, char*);
 char* getCellAtInd(char*, int);
-char* trim(char* str);
 char** moreCapacity(char**, int);
-Node* splitList(Node*);
-Node* mergeInts(Node*, Node*);
-Node* mergeFloats(Node*, Node*);
-Node* floatMergeSort(Node*);
-Node* intMergeSort(Node*);
-Node* mergeStrings(Node*, Node*);
-Node* stringMergeSort(Node*);
-Node* mergeSort(Node*, int);
 void* traverse(void*);
-void* sortFile(void*);
-void insertArr(char*);
-
 
 
 char** moreCapacity(char** lines, int size){
@@ -148,43 +132,6 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval,FILE
 
 	return remainder;
 }
-
-char* trim(char* str){
-	char* ans;
-
-	// trim leading spaces
-	while(isspace((unsigned char)* str)){
-		str++;
-	}
-
-	// check if str is all spaces
-	if(*str==0){
-		return str;
-	}
-
-	// trim leading spaces
-	ans = str + strlen(str) -1;
-	while(ans > str && isspace((unsigned char)* ans)){
-		ans--;
-	}
-
-	// null terminate the new string
-	*(ans+1) = 0;
-
-	return str;
-}
-Node* insertAtHead(Node* new1, Node* head){
-
-	if(head==NULL){
-		new1->next = NULL;
-		return new1;
-	}
-	new1->next = head;
-	return new1;
-
-
-}
-
 
 char* isDir(char* rootDirName, char* filename){
 
@@ -264,7 +211,6 @@ int getColNum(char* row1, char* colName){
 	char* token = strsep(&row,delim);
 	while(token != NULL){
 		if(strcmp(token, colName)==0){
-			if(title==NULL) title = strdup(row1);
 			return colCount;
 		}
 
@@ -328,23 +274,6 @@ char* getCellAtInd(char* row1, int colNum){
 //int portno;
 char* hostname;
 
-
-void insertArr(char* str){
-
-	if(globArrEnd + 10 > numElems){
-
-		globArr = moreCapacity(globArr, numElems);
-		numElems *= 1.5;
-	}
-
-
-	globArr[globArrEnd] = strdup(str);
-	globArrEnd++;
-
-
-
-
-}
 /*
 
 
@@ -382,7 +311,7 @@ void insertArr(char* str){
 
 
 int main(int argc, char* argv[]){
-	globArr = (char**)malloc(sizeof(char*) * 5000);
+
 	initialTID = syscall(__NR_gettid);
 	char* dirName = NULL;
 	char* colName = NULL;
