@@ -1,4 +1,4 @@
-# sorterPart2
+# sorterPart3
 
 ## Project Logic
 This is the general flow of logic in the sorter:
