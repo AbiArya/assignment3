@@ -10,7 +10,6 @@ int globArrEnd = 0;
 int numElems = 5000;
 int initialTID = -1;
 int finalSort = 0;
-int type = -1; //0=int, 1=float, 2=string
 char* title = NULL;
 int colNum = -2;
 

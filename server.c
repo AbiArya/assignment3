@@ -17,7 +17,6 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <pthread.h>
-//#include "sorter_thread.h"
 #include "client.h"
 
 //									MAKE SURE TO JOIN ALL THREADS BEFORE YOU DUMP
@@ -83,7 +82,8 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 	char *stuff = buffer;
 	char * print;
 	if(strlen(rval)!=0){
-		remainder = malloc(sizeof(char) * (strlen(rval) + strlen(buffer)) + 5     );
+		remainder = calloc(  strlen(rval) + strlen(buffer) + 5, sizeof(char));
+		
 		strcat(remainder, rval);
 		strcat(remainder,buffer);
 	}else{
@@ -93,14 +93,13 @@ char* recvall(int socket, char *buffer, size_t length, int flags,char *rval){
 	}
 
 	while((stuff=strstr(remainder,"srisrisri"))!=NULL){
-		print = malloc(sizeof(char)*(stuff-remainder) +1);
+		print = calloc( (stuff-remainder) +3, sizeof(char));
 		strncpy(print,remainder,(stuff-remainder));
 		print[strlen(print)]='\0';
 
 		pthread_mutex_lock(&lock);
 		insertArr(print);
 		pthread_mutex_unlock(&lock);
-		//free(print); //causes weird printing error
 		remainder = remainder + (stuff-remainder)+9;
 	}
 
@@ -138,34 +137,13 @@ void * sort(void *arg){
 	memset(buff,0,sizeof(buff));
 	int loop = 0;
 	char* row = NULL;
-	int column = 1;
-	int Number;
-	char *colNum = malloc(sizeof(char)*2);
 	char leftover[10001];
-	//leftover="";
-	/*	if((rval = recv(*mysock,buff,sizeof(buff),0))<0)
-		perror("reading stream message error");
-		else{
-	//column = atoi(buff);//should be column number
-	}*/
-
-	//printf("%i\n", column);
-	//	if(((Number = recv(*mysock,colNum,sizeof(colNum),0)))<0)
-	//		perror("reading stream message error");
-	//	else{
-	//		row = strdup(buff);//should be column number
-	//	}
-	//printf("after row\n");
-	//	printf("%i\n", atoi(colNum));
-	//	int col = atoi(colNum);
-
-
-	int isNumeric = 1;
-	int id = 0;
+	
+	int id = 1;
 
 
 
-	char* cellWithSpaces = getCellAtInd(row,column);
+	/*char* cellWithSpaces = getCellAtInd(row,column);
 	id++;
 
 	//discern data type of sorting column
@@ -195,7 +173,7 @@ void * sort(void *arg){
 		else if(isNumeric) type = 0;
 		else type = 2;
 		pthread_mutex_unlock(&lock);
-	}
+	}*/
 //	pthread_mutex_unlock(&lock);
 	memset(leftover,0,sizeof(leftover));
 
@@ -243,15 +221,41 @@ void * sort(void *arg){
 void dump(int * sock, int colNum){
 
 	//printf("%s", globArr[0]);
-
-
+	int type = -1;
+	int isFloat = 0;
+	int isNumeric = 1;
 	int ctr;
 	Node* head = NULL;
 
 	pthread_mutex_lock(&lock);
 	for(ctr=0;ctr<globArrEnd-1;ctr++){//take each string in globArr, make a node, sort the linked list, loop through the list and fprintf
 
+
 		char* cellWithSpaces = getCellAtInd(strdup(globArr[ctr]), colNum);
+
+
+		if(ctr == 0){
+
+			int i = 0;
+			while(i < strlen(cellWithSpaces)){
+
+				if(!isdigit(cellWithSpaces[i])){
+					if(cellWithSpaces[i] == '.'){
+						isFloat = 1;
+						i++;
+						continue;
+					}
+					isNumeric = 0;
+					break;
+				} 
+			i++;
+
+			}
+			if(isFloat) type = 1;
+			else if(isNumeric) type = 0;
+			else type = 2;
+
+		}
 
 		if(strcmp(cellWithSpaces, "Error") == 0){
 			printf("Error has occurred\n");

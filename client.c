@@ -467,7 +467,6 @@ int main(int argc, char* argv[]){
 	if(toOut==1){
 		if(outputDir[strlen(outputDir)-1]!='/')
 			strcat(finalName,"/"); 	
-		//	strcpy(finalName, outputDir);
 	}
 	strcat(finalName, "AllFiles-sorted-");
 	strcat(finalName, colName);
@@ -476,7 +475,7 @@ int main(int argc, char* argv[]){
 	char num[4];
 	sprintf(num,"%i", colNum);
 	FILE* h = fopen(finalName, "w+");
-	//char* rval="";
+
 	char buff[10001];
 	char leftover[10001];
 	memset(leftover,0,sizeof(leftover));
@@ -491,20 +490,6 @@ int main(int argc, char* argv[]){
 	while(output>0){
 
 
-		/*if(strcmp((rval = recvall(sock,buff,10000,0,leftover,h)),"ERROR")==0)
-			perror("error receiving stuff");
-		else{
-			if(strcmp(buff,"borisonufriyev")==0){
-				break;
-			}
-			if(strlen(rval)>0)
-				strcpy(leftover,rval);
-			//rval=strdup(leftover);
-			if(buff==NULL)
-				break;
-			//fprintf(h,"%s",buff);
-			memset(buff,0,sizeof(buff));		
-		}*/
 		if((output = recv(sock,buff,sizeof(buff),0))<0)
 			perror("error ");
 		else{
@@ -666,7 +651,6 @@ void* sendFile(void* param){
 	pthread_mutex_lock(&lock);
 	if(colNum == -2){
 		colNum = getColNum(titleRow, colName);
-		//printf("%i column number\n", colNum);
 	}
 	if(colNum == -1){
 		printf("Error has occured.\n");
@@ -705,18 +689,11 @@ void* sendFile(void* param){
 	}
 
 	char* row = getRow(fp);
-	char colLine[100];
 
-	pthread_mutex_lock(&lock);
-	char num = colNum + '0'; 
-	pthread_mutex_unlock(&lock);
 
-	// send col num
-	colLine[0] = num;
+
 	sendall(sock,"s", strlen("s"),0);
-	//	strcat(colLine, "srisrisri");
-	//	sendall(sock,strdup(colLine),strlen(colLine),0);
-
+	
 	// loop through each row and send to socket 
 	while(row!=NULL){
 
@@ -734,7 +711,6 @@ void* sendFile(void* param){
 	sendall(sock,"borisonufriyev",strlen("borisonufriyev"),0);
 
 	fclose(fp);
-//	printf("sent message");
 	close(sock);
 
 
