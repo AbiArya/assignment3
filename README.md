@@ -90,11 +90,13 @@ Solution: wrote sendall() and recvall() functions to make sure entire rows are s
 
 * There are some non-UTC characters in the given CSV, and as a result, these characters end up in our output as well. This causes problems if we dump the stdout output of our program into a text file and open it in gedit. We are assuming that, because there are non-UTC chars in the given CSV, this is not a problem.
 
-* Server code was compiled using "gcc -lpthread server.c -o server". After running the server, you run the client. Client compilation command used was "gcc -lpthread client.c -o client"
+* Server code was compiled using "gcc -lpthread sorter_server.c -o server". After running the server, you run the client. Client compilation command used was "gcc -lpthread sorter_client.c -o client"
 
 * Certain rows in the given CSV have movie titles or other columns with lots of trailing spaces. These are printed as is --- we trim them when sorting, but when outputting, the spaces are still there. We are assuming this is fine.
 
 * ***Server does not free its allocated memory after each dump request.***
+
+* We ran into an error where if the ulimit is exceeded, we get a "too many files open" error. We were assured that the ulimit will not be exceeded when grading.
 
 
 
